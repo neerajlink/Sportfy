@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}Players Database - Sports Injury Analysis{% endblock %}
+{% block breadcrumb %}Players Database{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1 style="color: var(--text-primary);">Players Database</h1>
+        <p style="color: var(--text-secondary);">Comprehensive database of {{ "{:,}".format(total_players) }} athletes with detailed injury records</p>
+    </div>
+    <div class="d-flex gap-2">
+        <span class="badge badge-info" style="font-size: 1rem; padding: 0.75rem 1.25rem;">
+            <i class="bi bi-people me-2"></i>{{ "{:,}".format(total_players) }} Players Found
+        </span>
+    </div>
+</div>
+
+<!-- Advanced Filters -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="bi bi-funnel-fill text-primary"></i>
+            Advanced Filters
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <label class="form-label" style="color: var(--text-primary);">Search Player</label>
+                <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Name, ID, or Team...">
+            </div>
+            <div class="col-xl-2 col-lg-3 col-md-6">
+                <label class="form-label" style="color: var(--text-primary);">Sport</label>
+                <select class="form-select" name="sport">
+                    <option value="">All Sports</option>
+                    {% for sport in sports %}
+                    <option value="{{ sport }}" {% if sport_filter == sport %}selected{% endif %}>{{ sport }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-xl-2 col-lg-3 col-md-6">
+                <label class="form-label" style="color: var(--text-primary);">Injury Status</label>
+                <select class="form-select" name="injury">
+                    <option value="">All</option>
+                    <option value="injured" {% if injury_filter == 'injured' %}selected{% endif %}>Currently Injured</option>
+                    <option value="healthy" {% if injury_filter == 'healthy' %}selected{% endif %}>Healthy</option>
+                </select>
+            </div>
+            <div class="col-xl-2 col-lg-3 col-md-6">
+                <label class="form-label" style="color: var(--text-primary);">Risk Level</label>
+                <select class="form-select" name="risk">
+                    <option value="">All Levels</option>
+                    <option value="low" {% if risk_filter == 'low' %}selected{% endif %}>Low (0-0.3)</option>
+                    <option value="moderate" {% if risk_filter == 'moderate' %}selected{% endif %}>Moderate (0.3-0.5)</option>
+                    <option value="high" {% if risk_filter == 'high' %}selected{% endif %}>High (0.5-0.7)</option>
+                    <option value="critical" {% if risk_filter == 'critical' %}selected{% endif %}>Critical (0.7+)</option>
+                </select>
+            </div>
+            <div class="col-xl-1 col-lg-2 col-md-6">
+                <label class="form-label" style="color: var(--text-primary);">Gender</label>
+                <select class="form-select" name="gender">
+                    <option value="">All</option>
+                    <option value="Male" {% if gender_filter == 'Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if gender_filter == 'Female' %}selected{% endif %}>Female</option>
+                </select>
+            </div>
+            <div class="col-xl-2 col-lg-3 col-md-6">
+                <label class="form-label" style="color: var(--text-primary);">Sort By</label>
+                <select class="form-select" name="sort">
+                    <option value="player_id" {% if sort_by == 'player_id' %}selected{% endif %}>Player ID</option>
+                    <option value="last_name" {% if sort_by == 'last_name' %}selected{% endif %}>Name</option>
+                    <option value="age" {% if sort_by == 'age' %}selected{% endif %}>Age</option>
+                    <option value="risk_score" {% if sort_by == 'risk_score' %}selected{% endif %}>Risk Score</option>
+                    <option value="total_injuries_career" {% if sort_by == 'total_injuries_career' %}selected{% endif %}>Total Injuries</option>
+                    <option value="fitness_level" {% if sort_by == 'fitness_level' %}selected{% endif %}>Fitness Level</option>
+                </select>
+            </div>
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-filter me-2"></i>Apply Filters
+                </button>
+                <a href="{{ url_for('players') }}" class="btn btn-secondary">
+                    <i class="bi bi-x-lg me-2"></i>Clear
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Players Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th style="color: var(--text-primary);">Player</th>
+                        <th style="color: var(--text-primary);">Sport / Position</th>
+                        <th style="color: var(--text-primary);">Age</th>
+                        <th style="color: var(--text-primary);">Team</th>
+                        <th style="color: var(--text-primary);">Current Injury</th>
+                        <th style="color: var(--text-primary);">Risk Score</th>
+                        <th style="color: var(--text-primary);">Fitness</th>
+                        <th style="color: var(--text-primary);">Status</th>
+                        <th style="color: var(--text-primary);">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in players %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: var(--gradient-primary); color: white; font-weight: 600; font-size: 0.95rem;">
+                                    {{ player.first_name[0] }}{{ player.last_name[0] }}
+                                </div>
+                                <div>
+                                    <strong style="color: var(--text-primary);">{{ player.first_name }} {{ player.last_name }}</strong>
+                                    <small class="d-block" style="color: var(--text-muted);">{{ player.player_id }} • {{ player.gender }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-info">{{ player.sport }}</span>
+                            <small class="d-block mt-1" style="color: var(--text-muted);">{{ player.position }}</small>
+                        </td>
+                        <td style="color: var(--text-primary);">{{ player.age }}</td>
+                        <td><small style="color: var(--text-secondary);">{{ player.team }}</small></td>
+                        <td>
+                            {% if player.current_injury != 'None' %}
+                            <span class="badge badge-danger">{{ player.current_injury }}</span>
+                            {% else %}
+                            <span class="badge badge-success">Healthy</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height: 8px; width: 70px;">
+                                    <div class="progress-bar" style="width: {{ player.risk_score * 100 }}%;
+                                        {% if player.risk_score > 0.7 %}background: linear-gradient(90deg, #ef4444, #dc2626);
+                                        {% elif player.risk_score > 0.5 %}background: linear-gradient(90deg, #f59e0b, #d97706);
+                                        {% elif player.risk_score > 0.3 %}background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+                                        {% else %}background: linear-gradient(90deg, #10b981, #059669);{% endif %}
+                                    "></div>
+                                </div>
+                                <small style="font-weight: 600; color: var(--text-primary);">{{ player.risk_score }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <small style="font-weight: 600; color: {% if player.fitness_level > 80 %}var(--success){% elif player.fitness_level > 60 %}var(--warning){% else %}var(--danger){% endif %};">
+                                {{ player.fitness_level }}%
+                            </small>
+                        </td>
+                        <td>
+                            {% if player.recovery_status == 'Fully Recovered' %}
+                            <span class="badge badge-success">Recovered</span>
+                            {% elif player.recovery_status == 'In Recovery' %}
+                            <span class="badge badge-warning">Recovering</span>
+                            {% elif player.recovery_status == 'Chronic' %}
+                            <span class="badge badge-danger">Chronic</span>
+                            {% else %}
+                            <span class="badge badge-purple">{{ player.recovery_status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('player_detail', player_id=player.player_id) }}" class="btn btn-sm btn-primary" title="View Details">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if total_pages > 1 %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page > 1 %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1&search={{ search }}&sport={{ sport_filter }}&injury={{ injury_filter }}&risk={{ risk_filter }}&gender={{ gender_filter }}&sort={{ sort_by }}&order={{ sort_order }}">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page - 1 }}&search={{ search }}&sport={{ sport_filter }}&injury={{ injury_filter }}&risk={{ risk_filter }}&gender={{ gender_filter }}&sort={{ sort_by }}&order={{ sort_order }}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        </li>
+        {% endif %}
+        
+        {% for p in range(1, total_pages + 1) %}
+            {% if p >= page - 2 and p <= page + 2 %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+                <a class="page-link" href="?page={{ p }}&search={{ search }}&sport={{ sport_filter }}&injury={{ injury_filter }}&risk={{ risk_filter }}&gender={{ gender_filter }}&sort={{ sort_by }}&order={{ sort_order }}">{{ p }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page < total_pages %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page + 1 }}&search={{ search }}&sport={{ sport_filter }}&injury={{ injury_filter }}&risk={{ risk_filter }}&gender={{ gender_filter }}&sort={{ sort_by }}&order={{ sort_order }}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ total_pages }}&search={{ search }}&sport={{ sport_filter }}&injury={{ injury_filter }}&risk={{ risk_filter }}&gender={{ gender_filter }}&sort={{ sort_by }}&order={{ sort_order }}">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+<p class="text-center text-muted">Page {{ page }} of {{ total_pages }} ({{ "{:,}".format(total_players) }} total players)</p>
+{% endif %}
+
+<!-- Added style block to fix table text visibility globally -->
+<style>
+.table th {
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.table td {
+    border-color: var(--border-color) !important;
+}
+
+.form-label {
+    color: var(--text-primary);
+}
+
+.page-item .page-link {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+.page-item.active .page-link {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.pagination .page-link:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+</style>
+{% endblock %}

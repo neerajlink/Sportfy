@@ -1,0 +1,861 @@
+{% extends 'base.html' %}
+
+{% block title %}ML Predictions - Sports Injury Analysis{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <!-- ML Model Info -->
+    <div class="col-12">
+        <div class="card" style="background: var(--gradient-primary); border: none;">
+            <div class="card-body py-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h3 class="text-white mb-2">
+                            <i class="bi bi-cpu me-2"></i>Machine Learning Injury Risk Predictions
+                        </h3>
+                        <p class="text-white-50 mb-0">
+                            Advanced predictive analytics using player data, injury history, and performance metrics to forecast injury risks and provide personalized recommendations.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <div class="d-flex justify-content-md-end gap-3">
+                            <div class="text-center">
+                                <h4 class="text-white mb-0">{{ predictions|length }}</h4>
+                                <small class="text-white-50">Players Analyzed</small>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="text-white mb-0">{{ high_risk_players|length }}</h4>
+                                <small class="text-white-50">High Risk</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prediction Form -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-calculator-fill text-success me-2"></i>
+                    Injury Risk Predictor
+                </h5>
+                <p class="text-muted mb-0">Enter player details to predict injury risk score</p>
+            </div>
+            <div class="card-body">
+                <form id="predictionForm" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Sport</label>
+                        <select class="form-select" name="sport" required>
+                            <option value="">Select Sport</option>
+                            <option value="Football">Football</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Soccer">Soccer</option>
+                            <option value="Baseball">Baseball</option>
+                            <option value="Tennis">Tennis</option>
+                            <option value="Hockey">Hockey</option>
+                            <option value="Rugby">Rugby</option>
+                            <option value="Cricket">Cricket</option>
+                            <option value="Swimming">Swimming</option>
+                            <option value="Athletics">Athletics</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Age</label>
+                        <input type="number" class="form-control" name="age" min="16" max="50" placeholder="e.g., 25" required>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Height (cm)</label>
+                        <input type="number" class="form-control" name="height" min="150" max="230" placeholder="e.g., 185" required>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Weight (kg)</label>
+                        <input type="number" class="form-control" name="weight" min="45" max="150" placeholder="e.g., 85" required>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Years Professional</label>
+                        <input type="number" class="form-control" name="years_pro" min="0" max="30" placeholder="e.g., 5" required>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Training Hours/Week</label>
+                        <input type="number" class="form-control" name="training_hours" min="5" max="60" placeholder="e.g., 25" required>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Total Previous Injuries</label>
+                        <input type="number" class="form-control" name="prev_injuries" min="0" max="20" placeholder="e.g., 3" required>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Previous Surgeries</label>
+                        <input type="number" class="form-control" name="surgeries" min="0" max="10" placeholder="e.g., 1" required>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label">Chronic Conditions</label>
+                        <select class="form-select" name="chronic_condition">
+                            <option value="None">None</option>
+                            <option value="Arthritis">Arthritis</option>
+                            <option value="Tendinitis">Tendinitis</option>
+                            <option value="Back Issues">Back Issues</option>
+                            <option value="Knee Issues">Knee Issues</option>
+                            <option value="Shoulder Instability">Shoulder Instability</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label">Fitness Level (%)</label>
+                        <input type="number" class="form-control" name="fitness" min="30" max="100" placeholder="e.g., 85" required>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label">Current Injury Status</label>
+                        <select class="form-select" name="current_injury">
+                            <option value="None">No Current Injury</option>
+                            <option value="Minor">Minor Injury</option>
+                            <option value="Moderate">Moderate Injury</option>
+                            <option value="Severe">Severe Injury</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12 mt-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-calculator me-1"></i> Calculate Risk Prediction
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="fillSample">
+                            <i class="bi bi-magic me-1"></i> Fill Sample Data
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Prediction Result -->
+                <div id="predictionResult" class="mt-4" style="display: none;">
+                    <div class="card border-0" style="background: linear-gradient(135deg, #1e293b, #334155);">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h4 class="text-white mb-2">Injury Risk Prediction Result</h4>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div id="riskGauge" style="width: 100px; height: 100px; margin-right: 20px;"></div>
+                                        <div>
+                                            <h1 id="riskScore" class="text-white mb-1">0%</h1>
+                                            <span id="riskCategory" class="badge badge-lg mb-2">Low Risk</span>
+                                            <p id="riskDescription" class="text-white-50 mb-0">Based on the provided player data</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 rounded" style="background: rgba(255,255,255,0.1);">
+                                        <h6 class="text-white mb-3">Recommendations</h6>
+                                        <ul id="recommendations" class="text-white-50 mb-0 ps-3">
+                                            <li>Loading recommendations...</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Risk Factors -->
+                            <div class="mt-4">
+                                <h6 class="text-white mb-3">Risk Factors Analysis</h6>
+                                <div class="row g-2" id="riskFactors">
+                                    <!-- Risk factors will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Sport Risk Analysis -->
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-bar-chart-fill text-info me-2"></i>
+                    Sport Risk Analysis
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Sport</th>
+                                <th>Avg Risk</th>
+                                <th>Max Risk</th>
+                                <th>Total Injuries</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sport, data in sport_risk.items() %}
+                            <tr>
+                                <td><strong>{{ sport }}</strong></td>
+                                <td>
+                                    <span class="badge {% if data.avg_risk > 0.5 %}badge-danger{% elif data.avg_risk > 0.35 %}badge-warning{% else %}badge-success{% endif %}">
+                                        {{ (data.avg_risk * 100)|round(1) }}%
+                                    </span>
+                                </td>
+                                <td>{{ (data.max_risk * 100)|round(1) }}%</td>
+                                <td>{{ data.total_injuries|int }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Injury Probability by Sport -->
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-percent text-warning me-2"></i>
+                    Current Injury Rate by Sport
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for sport, prob in injury_prob.items() %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>{{ sport }}</span>
+                        <span style="font-weight: 600;">{{ prob }}%</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar" style="width: {{ prob }}%; background: {% if prob > 40 %}linear-gradient(90deg, #ef4444, #dc2626){% elif prob > 30 %}linear-gradient(90deg, #f59e0b, #d97706){% else %}linear-gradient(90deg, #10b981, #059669){% endif %};"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- High Risk Position Analysis -->
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-exclamation-diamond text-danger me-2"></i>
+                    Highest Risk Positions
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Sport</th>
+                                <th>Position</th>
+                                <th>Avg Risk</th>
+                                <th>Players</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for position in position_risk[:15] %}
+                            <tr>
+                                <td>{{ position.sport }}</td>
+                                <td><strong>{{ position.position }}</strong></td>
+                                <td>
+                                    <span class="badge {% if position.avg_risk > 0.5 %}badge-danger{% elif position.avg_risk > 0.4 %}badge-warning{% else %}badge-info{% endif %}">
+                                        {{ (position.avg_risk * 100)|round(1) }}%
+                                    </span>
+                                </td>
+                                <td>{{ position.player_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Age-Based Risk -->
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-calendar3 me-2" style="color: #7c3aed;"></i>
+                    Age-Based Risk Prediction
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="ageRiskChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Individual Predictions Table -->
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-clipboard-data text-primary me-2"></i>
+            Individual Risk Predictions
+        </h5>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm btn-secondary active" data-filter="all">All</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-filter="Critical">Critical</button>
+            <button type="button" class="btn btn-sm btn-outline-warning" data-filter="High">High</button>
+            <button type="button" class="btn btn-sm btn-outline-info" data-filter="Medium">Medium</button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="predictionsTable">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Sport / Position</th>
+                        <th>Current Risk</th>
+                        <th>Predicted Risk</th>
+                        <th>Change</th>
+                        <th>Priority</th>
+                        <th>Recommendation</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pred in predictions %}
+                    <tr data-priority="{{ pred.priority }}">
+                        <td>
+                            <div>
+                                <strong>{{ pred.name }}</strong>
+                                <small class="d-block text-muted">{{ pred.player_id }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-secondary">{{ pred.sport }}</span>
+                            <small class="d-block text-muted">{{ pred.position }}</small>
+                        </td>
+                        <td>
+                            <span class="badge {% if pred.current_risk > 0.7 %}badge-danger{% elif pred.current_risk > 0.5 %}badge-warning{% else %}badge-success{% endif %}">
+                                {{ (pred.current_risk * 100)|round(1) }}%
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if pred.predicted_risk > 0.7 %}badge-danger{% elif pred.predicted_risk > 0.5 %}badge-warning{% else %}badge-success{% endif %}">
+                                {{ (pred.predicted_risk * 100)|round(1) }}%
+                            </span>
+                        </td>
+                        <td>
+                            {% if pred.risk_change > 0 %}
+                            <span class="text-danger"><i class="bi bi-arrow-up"></i> +{{ (pred.risk_change * 100)|round(1) }}%</span>
+                            {% elif pred.risk_change < 0 %}
+                            <span class="text-success"><i class="bi bi-arrow-down"></i> {{ (pred.risk_change * 100)|round(1) }}%</span>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if pred.priority == 'Critical' %}badge-danger{% elif pred.priority == 'High' %}badge-warning{% elif pred.priority == 'Medium' %}badge-info{% else %}badge-success{% endif %}">
+                                {{ pred.priority }}
+                            </span>
+                        </td>
+                        <td style="max-width: 200px;">
+                            <small>{{ pred.recommendation }}</small>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('player_detail', player_id=pred.player_id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- High Risk Players Alert -->
+<div class="card mt-4" style="border: 2px solid rgba(239, 68, 68, 0.5);">
+    <div class="card-header" style="background: rgba(239, 68, 68, 0.1);">
+        <h5 class="card-title mb-0 text-danger">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Critical Alert: High Risk Players (Risk > 70%)
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            {% for player in high_risk_players[:12] %}
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <a href="{{ url_for('player_detail', player_id=player.player_id) }}" class="text-decoration-none">
+                    <div class="p-3 rounded" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); transition: all 0.3s;">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 50%; font-size: 1rem; color: white; font-weight: 600;">
+                                {{ player.first_name[0] }}{{ player.last_name[0] }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <strong style="color: var(--text-primary);">{{ player.first_name }} {{ player.last_name }}</strong>
+                                <small class="d-block text-muted">{{ player.sport }}</small>
+                            </div>
+                            <div class="text-end">
+                                <h5 class="mb-0 text-danger">{{ (player.risk_score * 100)|int }}%</h5>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/progressbar.js@1.1.0/dist/progressbar.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Age Risk Chart
+    const ageRiskData = {{ age_risk|tojson }};
+    const labels = Object.keys(ageRiskData);
+    const data = Object.values(ageRiskData);
+    
+    const ageRiskChartEl = document.getElementById('ageRiskChart');
+    if (ageRiskChartEl) {
+        new Chart(ageRiskChartEl, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Average Risk Score',
+                    data: data.map(d => d * 100),
+                    backgroundColor: data.map(d => {
+                        if (d > 0.5) return 'rgba(239, 68, 68, 0.8)';
+                        if (d > 0.4) return 'rgba(245, 158, 11, 0.8)';
+                        return 'rgba(6, 182, 212, 0.8)';
+                    }),
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: value => value + '%',
+                            color: 'rgba(255,255,255,0.7)'
+                        },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    x: {
+                        ticks: { color: 'rgba(255,255,255,0.7)' },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Filter functionality
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            
+            // Reset all buttons
+            document.querySelectorAll('[data-filter]').forEach(b => {
+                b.classList.remove('active', 'btn-secondary');
+                b.classList.add('btn-outline-secondary');
+            });
+            
+            // Activate clicked button
+            this.classList.add('active', 'btn-secondary');
+            this.classList.remove('btn-outline-secondary');
+            
+            // Filter table rows
+            document.querySelectorAll('#predictionsTable tbody tr').forEach(row => {
+                if (filter === 'all' || row.dataset.priority === filter) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Sample Data Button
+    document.getElementById('fillSample').addEventListener('click', function() {
+        const form = document.getElementById('predictionForm');
+        form.querySelector('[name="sport"]').value = 'Football';
+        form.querySelector('[name="age"]').value = 28;
+        form.querySelector('[name="height"]').value = 188;
+        form.querySelector('[name="weight"]').value = 95;
+        form.querySelector('[name="years_pro"]').value = 6;
+        form.querySelector('[name="training_hours"]').value = 30;
+        form.querySelector('[name="prev_injuries"]').value = 3;
+        form.querySelector('[name="surgeries"]').value = 1;
+        form.querySelector('[name="chronic_condition"]').value = 'Knee Issues';
+        form.querySelector('[name="fitness"]').value = 78;
+        form.querySelector('[name="current_injury"]').value = 'Minor';
+    });
+    
+    // Prediction Form Submission
+    document.getElementById('predictionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+        
+        // Calculate risk score
+        const riskScore = calculateRiskScore(data);
+        const riskCategory = getRiskCategory(riskScore);
+        
+        // Calculate BMI
+        const heightM = data.height / 100;
+        const bmi = (data.weight / (heightM * heightM)).toFixed(1);
+        
+        // Generate risk factors
+        const riskFactors = analyzeRiskFactors(data, bmi);
+        
+        // Update UI
+        document.getElementById('predictionResult').style.display = 'block';
+        updateRiskGauge(riskScore);
+        document.getElementById('riskScore').textContent = (riskScore * 100).toFixed(1) + '%';
+        document.getElementById('riskCategory').textContent = riskCategory.label;
+        document.getElementById('riskCategory').className = `badge badge-lg ${riskCategory.class}`;
+        document.getElementById('riskDescription').textContent = riskCategory.description;
+        
+        // Update recommendations
+        updateRecommendations(riskScore, data, riskFactors);
+        
+        // Update risk factors
+        updateRiskFactorsDisplay(riskFactors);
+        
+        // Scroll to result
+        document.getElementById('predictionResult').scrollIntoView({ behavior: 'smooth' });
+    });
+    
+    function calculateRiskScore(data) {
+        let score = 0;
+        
+        // Age factor
+        const age = parseInt(data.age);
+        if (age > 35) score += 0.15;
+        else if (age > 30) score += 0.10;
+        else if (age > 25) score += 0.05;
+        
+        // Sport factor
+        const sportRiskFactors = {
+            'Football': 0.15, 'Rugby': 0.15, 'Hockey': 0.12,
+            'Soccer': 0.10, 'Basketball': 0.10, 'Tennis': 0.08,
+            'Baseball': 0.08, 'Athletics': 0.08, 'Cricket': 0.06,
+            'Swimming': 0.05
+        };
+        score += sportRiskFactors[data.sport] || 0.08;
+        
+        // Previous injuries
+        const injuries = parseInt(data.prev_injuries);
+        score += Math.min(injuries * 0.03, 0.15);
+        
+        // Surgeries
+        const surgeries = parseInt(data.surgeries);
+        score += Math.min(surgeries * 0.05, 0.10);
+        
+        // Training hours (overtraining risk)
+        const training = parseInt(data.training_hours);
+        if (training > 35) score += 0.08;
+        else if (training > 25) score += 0.04;
+        
+        // Chronic conditions
+        if (data.chronic_condition !== 'None') score += 0.12;
+        
+        // Current injury
+        if (data.current_injury === 'Severe') score += 0.10;
+        else if (data.current_injury === 'Moderate') score += 0.05;
+        else if (data.current_injury === 'Minor') score += 0.02;
+        
+        // Fitness level
+        const fitness = parseInt(data.fitness);
+        if (fitness < 60) score += 0.08;
+        else if (fitness < 70) score += 0.04;
+        
+        // Years professional
+        const yearsPro = parseInt(data.years_pro);
+        score += Math.min(yearsPro * 0.01, 0.05);
+        
+        // BMI calculation
+        const heightM = parseInt(data.height) / 100;
+        const bmi = parseInt(data.weight) / (heightM * heightM);
+        if (bmi > 28) score += 0.06;
+        else if (bmi < 18.5) score += 0.04;
+        
+        // Add random factor for realism
+        score += (Math.random() * 0.05);
+        
+        // Ensure score is between 0.05 and 0.95
+        return Math.max(0.05, Math.min(0.95, score));
+    }
+    
+    function getRiskCategory(score) {
+        const percent = score * 100;
+        if (percent >= 70) {
+            return {
+                label: 'Critical Risk',
+                class: 'badge-danger',
+                description: 'Immediate attention required. High probability of injury.'
+            };
+        } else if (percent >= 50) {
+            return {
+                label: 'High Risk',
+                class: 'badge-warning',
+                description: 'Close monitoring recommended. Elevated injury risk.'
+            };
+        } else if (percent >= 30) {
+            return {
+                label: 'Moderate Risk',
+                class: 'badge-info',
+                description: 'Standard monitoring advised. Some risk factors present.'
+            };
+        } else {
+            return {
+                label: 'Low Risk',
+                class: 'badge-success',
+                description: 'Minimal risk. Continue current training regimen.'
+            };
+        }
+    }
+    
+    function analyzeRiskFactors(data, bmi) {
+        const factors = [];
+        
+        // Age analysis
+        const age = parseInt(data.age);
+        if (age > 32) {
+            factors.push({
+                factor: 'Age Factor',
+                impact: age > 35 ? 'High' : 'Medium',
+                description: `Age ${age} increases injury susceptibility`,
+                value: age
+            });
+        }
+        
+        // BMI analysis
+        if (bmi > 28) {
+            factors.push({
+                factor: 'BMI Factor',
+                impact: 'Medium',
+                description: `BMI ${bmi} (Overweight) - Increased joint stress`,
+                value: bmi
+            });
+        } else if (bmi < 18.5) {
+            factors.push({
+                factor: 'BMI Factor',
+                impact: 'Medium',
+                description: `BMI ${bmi} (Underweight) - Reduced muscle protection`,
+                value: bmi
+            });
+        }
+        
+        // Injury history
+        const injuries = parseInt(data.prev_injuries);
+        if (injuries > 2) {
+            factors.push({
+                factor: 'Injury History',
+                impact: injuries > 4 ? 'High' : 'Medium',
+                description: `${injuries} previous injuries increase recurrence risk`,
+                value: injuries
+            });
+        }
+        
+        // Surgical history
+        const surgeries = parseInt(data.surgeries);
+        if (surgeries > 0) {
+            factors.push({
+                factor: 'Surgical History',
+                impact: surgeries > 1 ? 'High' : 'Medium',
+                description: `${surgeries} previous surgeries`,
+                value: surgeries
+            });
+        }
+        
+        // Training load
+        const training = parseInt(data.training_hours);
+        if (training > 35) {
+            factors.push({
+                factor: 'Training Load',
+                impact: 'Medium',
+                description: `${training} hours/week may lead to overtraining`,
+                value: training
+            });
+        }
+        
+        // Chronic conditions
+        if (data.chronic_condition !== 'None') {
+            factors.push({
+                factor: 'Chronic Condition',
+                impact: 'High',
+                description: data.chronic_condition,
+                value: data.chronic_condition
+            });
+        }
+        
+        // Fitness level
+        const fitness = parseInt(data.fitness);
+        if (fitness < 70) {
+            factors.push({
+                factor: 'Fitness Level',
+                impact: fitness < 60 ? 'Medium' : 'Low',
+                description: `Fitness score ${fitness}% - Needs improvement`,
+                value: fitness
+            });
+        }
+        
+        // Current injury
+        if (data.current_injury !== 'None') {
+            factors.push({
+                factor: 'Current Injury',
+                impact: data.current_injury === 'Severe' ? 'High' : 'Medium',
+                description: `${data.current_injury} injury present`,
+                value: data.current_injury
+            });
+        }
+        
+        return factors;
+    }
+    
+    function updateRiskGauge(score) {
+        const gaugeEl = document.getElementById('riskGauge');
+        gaugeEl.innerHTML = '';
+        
+        const gauge = new ProgressBar.Circle(gaugeEl, {
+            color: getGaugeColor(score),
+            strokeWidth: 8,
+            trailWidth: 8,
+            trailColor: 'rgba(255,255,255,0.1)',
+            easing: 'easeInOut',
+            duration: 1400,
+            text: {
+                value: (score * 100).toFixed(1) + '%',
+                style: {
+                    color: '#fff',
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    padding: 0,
+                    margin: 0,
+                    transform: 'translate(-50%, -50%)',
+                    fontSize: '18px',
+                    fontWeight: 'bold'
+                }
+            }
+        });
+        
+        gauge.animate(score);
+    }
+    
+    function getGaugeColor(score) {
+        const percent = score * 100;
+        if (percent >= 70) return '#ef4444';
+        if (percent >= 50) return '#f59e0b';
+        if (percent >= 30) return '#3b82f6';
+        return '#10b981';
+    }
+    
+    function updateRecommendations(score, data, riskFactors) {
+        const recommendations = [];
+        const percent = score * 100;
+        
+        if (percent >= 70) {
+            recommendations.push('Immediate medical evaluation recommended');
+            recommendations.push('Reduce training intensity by 50%');
+            recommendations.push('Consider rest period of 2-4 weeks');
+            recommendations.push('Implement comprehensive injury prevention program');
+        } else if (percent >= 50) {
+            recommendations.push('Schedule sports medicine consultation');
+            recommendations.push('Implement targeted strengthening exercises');
+            recommendations.push('Monitor training load closely');
+            recommendations.push('Consider biomechanical assessment');
+        } else if (percent >= 30) {
+            recommendations.push('Continue regular training with monitoring');
+            recommendations.push('Focus on proprioception and balance training');
+            recommendations.push('Maintain proper warm-up and cool-down routines');
+            recommendations.push('Regular flexibility and mobility work');
+        } else {
+            recommendations.push('Continue current training regimen');
+            recommendations.push('Maintain proper nutrition and hydration');
+            recommendations.push('Regular injury prevention screening');
+            recommendations.push('Annual comprehensive medical checkup');
+        }
+        
+        // Add sport-specific recommendations
+        if (data.sport === 'Football' || data.sport === 'Rugby') {
+            recommendations.push('Focus on lower body strength and proprioception');
+        } else if (data.sport === 'Basketball') {
+            recommendations.push('Implement landing mechanics training');
+        } else if (data.sport === 'Tennis' || data.sport === 'Baseball') {
+            recommendations.push('Implement throwing/shoulder maintenance program');
+        }
+        
+        // Add recommendations based on risk factors
+        riskFactors.forEach(factor => {
+            if (factor.impact === 'High') {
+                if (factor.factor === 'Chronic Condition') {
+                    recommendations.push(`Manage ${factor.value} with specialist care`);
+                } else if (factor.factor === 'Training Load') {
+                    recommendations.push(`Consider reducing training volume by 20%`);
+                }
+            }
+        });
+        
+        // Update HTML
+        const listEl = document.getElementById('recommendations');
+        listEl.innerHTML = '';
+        recommendations.forEach(rec => {
+            const li = document.createElement('li');
+            li.textContent = rec;
+            li.className = 'mb-1';
+            listEl.appendChild(li);
+        });
+    }
+    
+    function updateRiskFactorsDisplay(factors) {
+        const container = document.getElementById('riskFactors');
+        container.innerHTML = '';
+        
+        factors.forEach(factor => {
+            const col = document.createElement('div');
+            col.className = 'col-md-4';
+            
+            const impactClass = factor.impact === 'High' ? 'danger' : 
+                               factor.impact === 'Medium' ? 'warning' : 'info';
+            
+            col.innerHTML = `
+                <div class="p-2 rounded" style="background: rgba(255,255,255,0.05);">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <strong class="text-white">${factor.factor}</strong>
+                        <span class="badge badge-${impactClass}">${factor.impact}</span>
+                    </div>
+                    <small class="text-white-50 d-block">${factor.description}</small>
+                </div>
+            `;
+            
+            container.appendChild(col);
+        });
+    }
+});
+</script>
+{% endblock %}

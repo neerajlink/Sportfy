@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Error {{ error_code }} - Sports Injury Analysis{% endblock %}
+{% block breadcrumb %}Error{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+            <div class="card" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <div class="card-body py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 5rem;"></i>
+                    </div>
+                    <h1 class="display-1 text-gradient mb-3" style="font-weight: 800;">{{ error_code }}</h1>
+                    <h4 class="mb-4" style="color: var(--text-primary);">{{ message }}</h4>
+                    <p class="text-muted mb-4">
+                        {% if error_code == 404 %}
+                        The page you're looking for doesn't exist or has been moved.
+                        {% else %}
+                        Something went wrong on our end. Please try again later.
+                        {% endif %}
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('home') }}" class="btn btn-primary">
+                            <i class="bi bi-house me-2"></i>Go Home
+                        </a>
+                        <button onclick="history.back()" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Go Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <p class="text-muted small">
+                    If this problem persists, please contact support or try refreshing the page.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

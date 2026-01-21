@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics - Sports Injury Analysis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="mb-2" style="font-weight: 700; color: var(--text-primary);">Analytics Dashboard</h1>
+    <p style="color: var(--text-secondary);">Advanced data visualization and injury pattern analysis</p>
+</div>
+
+<div class="row g-4">
+    <!-- Injury by Sport Chart -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-graph-up text-primary me-2"></i>Injuries by Sport
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 350px;">
+                    <canvas id="injurySportChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Severity Distribution -->
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-pie-chart text-danger me-2"></i>Severity Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="severityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Injury Types Distribution -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-bandaid text-warning me-2"></i>Top Injury Types
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="injuryTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Age vs Injuries -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-calendar-event text-info me-2"></i>Injuries by Age Group
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="ageInjuryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recovery Status -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-heart-pulse text-success me-2"></i>Recovery Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 280px;">
+                    <canvas id="recoveryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Risk Distribution -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-shield-exclamation me-2" style="color: #7c3aed;"></i>Risk Categories
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 280px;">
+                    <canvas id="riskDistChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Monthly Trend -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-graph-up-arrow me-2" style="color: #f97316;"></i>Monthly Trend
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 280px;">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sport Statistics Table -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-table text-info me-2"></i>Sport-wise Injury Statistics
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Sport</th>
+                                <th>Total Injuries</th>
+                                <th>Avg Risk Score</th>
+                                <th>Days Missed</th>
+                                <th>Risk Level</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Fixed variable names to match Flask route output -->
+                            {% for sport, data in injury_by_sport.items() %}
+                            <tr>
+                                <td>
+                                    <strong>{{ sport }}</strong>
+                                </td>
+                                <td>{{ data.total_injuries }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 6px; width: 80px;">
+                                            <div class="progress-bar" style="width: {{ data.avg_risk * 100 }}%;
+                                                {% if data.avg_risk > 0.5 %}background: #ef4444;
+                                                {% elif data.avg_risk > 0.35 %}background: #f59e0b;
+                                                {% else %}background: #10b981;{% endif %}
+                                            "></div>
+                                        </div>
+                                        <small>{{ data.avg_risk }}</small>
+                                    </div>
+                                </td>
+                                <td>{{ data.days_missed }}</td>
+                                <td>
+                                    {% if data.avg_risk > 0.5 %}
+                                    <span class="badge badge-danger">High</span>
+                                    {% elif data.avg_risk > 0.35 %}
+                                    <span class="badge badge-warning">Medium</span>
+                                    {% else %}
+                                    <span class="badge badge-success">Low</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function getTextColor() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        return isDark ? 'rgba(248, 250, 252, 0.8)' : 'rgba(30, 41, 59, 0.9)';
+    }
+    
+    function getGridColor() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        return isDark ? 'rgba(148, 163, 184, 0.15)' : 'rgba(15, 23, 42, 0.1)';
+    }
+    
+    const textColor = getTextColor();
+    const gridColor = getGridColor();
+
+    const chartColors = {
+        primary: 'rgba(14, 165, 233, 0.8)',
+        secondary: 'rgba(124, 58, 237, 0.8)',
+        success: 'rgba(16, 185, 129, 0.8)',
+        warning: 'rgba(245, 158, 11, 0.8)',
+        danger: 'rgba(239, 68, 68, 0.8)',
+        pink: 'rgba(236, 72, 153, 0.8)'
+    };
+    
+    // Injury by Sport
+    const sportData = {{ injury_by_sport | tojson }};
+    new Chart(document.getElementById('injurySportChart'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(sportData),
+            datasets: [{
+                label: 'Total Injuries',
+                data: Object.values(sportData).map(d => d.total_injuries),
+                backgroundColor: chartColors.primary,
+                borderRadius: 8
+            }, {
+                label: 'Days Missed (÷10)',
+                data: Object.values(sportData).map(d => d.days_missed / 10),
+                backgroundColor: chartColors.secondary,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: textColor } }
+            },
+            scales: {
+                y: { grid: { color: gridColor }, ticks: { color: textColor } },
+                x: { grid: { display: false }, ticks: { color: textColor } }
+            }
+        }
+    });
+    
+    // Severity Distribution
+    const severityData = {{ severity_dist | tojson }};
+    new Chart(document.getElementById('severityChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(severityData),
+            datasets: [{
+                data: Object.values(severityData),
+                backgroundColor: [chartColors.success, chartColors.warning, chartColors.danger, chartColors.secondary],
+                borderWidth: 0,
+                cutout: '60%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: textColor, padding: 15 } }
+            }
+        }
+    });
+    
+    // Injury Types
+    const injuryTypes = {{ injury_distribution | tojson }};
+    const topInjuries = Object.entries(injuryTypes).slice(0, 8);
+    new Chart(document.getElementById('injuryTypeChart'), {
+        type: 'bar',
+        data: {
+            labels: topInjuries.map(([k]) => k),
+            datasets: [{
+                data: topInjuries.map(([, v]) => v),
+                backgroundColor: [
+                    chartColors.primary, chartColors.secondary, chartColors.success,
+                    chartColors.warning, chartColors.danger, chartColors.pink,
+                    'rgba(59, 130, 246, 0.8)', 'rgba(168, 85, 247, 0.8)'
+                ],
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: gridColor }, ticks: { color: textColor } },
+                y: { grid: { display: false }, ticks: { color: textColor } }
+            }
+        }
+    });
+    
+    // Age vs Injuries
+    const ageData = {{ injury_by_age | tojson }};
+    new Chart(document.getElementById('ageInjuryChart'), {
+        type: 'line',
+        data: {
+            labels: Object.keys(ageData),
+            datasets: [{
+                label: 'Avg Injuries',
+                data: Object.values(ageData),
+                borderColor: chartColors.primary,
+                backgroundColor: 'rgba(14, 165, 233, 0.2)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointBackgroundColor: chartColors.primary
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: gridColor }, ticks: { color: textColor } },
+                x: { grid: { display: false }, ticks: { color: textColor } }
+            }
+        }
+    });
+    
+    // Recovery Status
+    const recoveryData = {{ recovery_status_dist | tojson }};
+    new Chart(document.getElementById('recoveryChart'), {
+        type: 'polarArea',
+        data: {
+            labels: Object.keys(recoveryData),
+            datasets: [{
+                data: Object.values(recoveryData),
+                backgroundColor: [chartColors.success, chartColors.warning, chartColors.danger, chartColors.secondary]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: textColor, padding: 10, font: { size: 10 } } }
+            },
+            scales: { r: { ticks: { display: false }, grid: { color: gridColor } } }
+        }
+    });
+    
+    // Risk Distribution
+    const riskData = {{ risk_dist | tojson }};
+    new Chart(document.getElementById('riskDistChart'), {
+        type: 'pie',
+        data: {
+            labels: Object.keys(riskData),
+            datasets: [{
+                data: Object.values(riskData),
+                backgroundColor: [chartColors.success, chartColors.warning, chartColors.danger, chartColors.secondary],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: textColor, padding: 10, font: { size: 10 } } }
+            }
+        }
+    });
+    
+    // Monthly Trend
+    const trendData = {{ monthly_trend | tojson }};
+    new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: {
+            labels: Object.keys(trendData).reverse(),
+            datasets: [{
+                label: 'Injuries',
+                data: Object.values(trendData).reverse(),
+                borderColor: chartColors.warning,
+                backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: gridColor }, ticks: { color: textColor } },
+                x: { grid: { display: false }, ticks: { color: textColor, maxRotation: 45 } }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,696 @@
+{% extends 'base.html' %}
+
+{% block title %}Treatment Timeline - Sports Injury Analysis{% endblock %}
+{% block breadcrumb %}Treatment Timeline{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 style="color: var(--text-primary);">Treatment Timeline Visualizer</h1>
+        <p style="color: var(--text-secondary);">Interactive visualization of injury treatment phases and progress</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTimelineModal">
+        <i class="bi bi-plus-circle me-2"></i>New Timeline
+    </button>
+</div>
+
+<!-- Patient Selection -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="bi bi-person-badge text-primary me-2"></i>Select Patient
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label" style="color: var(--text-primary);">Search Player</label>
+                <select class="form-select" id="playerSelect">
+                    <option value="">Select a player...</option>
+                    {% for player in players %}
+                    <option value="{{ player.player_id }}">{{ player.first_name }} {{ player.last_name }} - {{ player.player_id }} ({{ player.sport }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" style="color: var(--text-primary);">Current Injury</label>
+                <input type="text" class="form-control" id="currentInjury" placeholder="Select player first..." readonly>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Timeline Visualization -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="bi bi-calendar-timeline text-info me-2"></i>Treatment Timeline
+        </h5>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-outline-primary" onclick="changeView('weeks')">Weeks View</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="changeView('months')">Months View</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="changeView('phases')">Phases View</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="timelineContainer">
+            <!-- Timeline will be dynamically generated here -->
+            <div class="text-center py-5" id="emptyTimeline">
+                <i class="bi bi-calendar-heart display-1 text-muted mb-3"></i>
+                <h5 class="text-muted">No timeline selected</h5>
+                <p class="text-muted">Select a player to view their treatment timeline or create a new one</p>
+            </div>
+            
+            <div id="activeTimeline" style="display: none;">
+                <!-- Timeline Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 id="timelinePlayerName" style="color: var(--text-primary);"></h4>
+                        <p id="timelineInjuryInfo" class="text-muted mb-0"></p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary" onclick="addPhase()">
+                            <i class="bi bi-plus-circle me-1"></i>Add Phase
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" onclick="exportTimeline()">
+                            <i class="bi bi-download me-1"></i>Export
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Timeline Visualization -->
+                <div class="timeline-wrapper">
+                    <div class="timeline-track" id="timelineTrack">
+                        <!-- Timeline phases will be inserted here dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Phase Details -->
+                <div class="mt-4" id="phaseDetails" style="display: none;">
+                    <h5 style="color: var(--text-primary);">Phase Details</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row" id="phaseContent">
+                                <!-- Phase details will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Treatment Phases Summary -->
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-clipboard2-pulse text-success me-2"></i>Phase Completion Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table" id="phaseStatusTable">
+                        <thead>
+                            <tr>
+                                <th style="color: var(--text-primary);">Phase</th>
+                                <th style="color: var(--text-primary);">Status</th>
+                                <th style="color: var(--text-primary);">Progress</th>
+                                <th style="color: var(--text-primary);">Days</th>
+                            </tr>
+                        </thead>
+                        <tbody id="phaseStatusBody">
+                            <!-- Will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-graph-up text-warning me-2"></i>Recovery Progress
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="recoveryChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for New Timeline -->
+<div class="modal fade" id="newTimelineModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Treatment Timeline</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newTimelineForm">
+                    <div class="mb-3">
+                        <label class="form-label">Player</label>
+                        <select class="form-select" name="player_id" required>
+                            <option value="">Select player...</option>
+                            {% for player in players %}
+                            <option value="{{ player.player_id }}">{{ player.first_name }} {{ player.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Injury Type</label>
+                        <input type="text" class="form-control" name="injury_type" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Injury Date</label>
+                        <input type="date" class="form-control" name="injury_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Expected Recovery Duration (weeks)</label>
+                        <input type="number" class="form-control" name="expected_weeks" min="1" max="104" value="12">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Treatment Protocol</label>
+                        <textarea class="form-control" name="protocol" rows="3" placeholder="Describe the treatment approach..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createNewTimeline()">Create Timeline</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Phase Details -->
+<div class="modal fade" id="phaseModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Phase Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="phaseModalBody">
+                <!-- Phase details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-wrapper {
+    overflow-x: auto;
+    padding: 20px 0;
+}
+
+.timeline-track {
+    display: flex;
+    min-width: 1000px;
+    gap: 10px;
+    padding: 20px 0;
+    position: relative;
+}
+
+.timeline-track::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--border-color);
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.phase-card {
+    flex: 0 0 180px;
+    background: var(--bg-card-solid);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.phase-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 25px rgba(6, 182, 212, 0.2);
+}
+
+.phase-card.active {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+.phase-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.phase-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.status-planned { background: rgba(148, 163, 184, 0.2); color: var(--text-muted); }
+.status-active { background: rgba(6, 182, 212, 0.2); color: var(--primary); }
+.status-completed { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.status-delayed { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+.phase-progress {
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.phase-progress-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--gradient-primary);
+}
+
+.phase-connector {
+    position: absolute;
+    right: -11px;
+    top: 50%;
+    width: 20px;
+    height: 2px;
+    background: var(--border-color);
+    z-index: 1;
+}
+
+.phase-connector.completed {
+    background: var(--primary);
+}
+</style>
+
+<script>
+let currentTimeline = null;
+let currentView = 'phases';
+
+// Sample data structure for treatment phases
+const treatmentPhases = {
+    'ACL Reconstruction': [
+        {
+            id: 1,
+            name: 'Acute Phase',
+            duration: 'Week 1-2',
+            status: 'completed',
+            progress: 100,
+            goals: ['Pain control', 'Reduce swelling', 'Restore range of motion'],
+            exercises: ['Ankle pumps', 'Quad sets', 'Heel slides'],
+            restrictions: ['Non-weight bearing', 'Brace locked at 0°'],
+            notes: 'Focus on pain management and swelling control'
+        },
+        {
+            id: 2,
+            name: 'Early Rehabilitation',
+            duration: 'Week 3-6',
+            status: 'active',
+            progress: 60,
+            goals: ['Full extension', '90° flexion', 'Gait training'],
+            exercises: ['Straight leg raises', 'Prone hangs', 'Stationary bike'],
+            restrictions: ['Partial weight bearing', 'No pivoting'],
+            notes: 'Gradual increase in weight bearing as tolerated'
+        },
+        {
+            id: 3,
+            name: 'Strengthening Phase',
+            duration: 'Week 7-12',
+            status: 'planned',
+            progress: 0,
+            goals: ['Full range of motion', 'Normal gait', 'Leg strength 70%'],
+            exercises: ['Mini squats', 'Leg press', 'Balance exercises'],
+            restrictions: ['No running', 'No jumping'],
+            notes: 'Focus on symmetrical strength development'
+        },
+        {
+            id: 4,
+            name: 'Advanced Training',
+            duration: 'Month 4-6',
+            status: 'planned',
+            progress: 0,
+            goals: ['Sports-specific drills', 'Agility training', 'Power development'],
+            exercises: ['Running progression', 'Cutting drills', 'Plyometrics'],
+            restrictions: ['Limited contact', 'Monitor swelling'],
+            notes: 'Progress based on functional testing'
+        },
+        {
+            id: 5,
+            name: 'Return to Sport',
+            duration: 'Month 7-9',
+            status: 'planned',
+            progress: 0,
+            goals: ['Full clearance', 'Sport participation', 'Maintenance program'],
+            exercises: ['Full practice', 'Scrimmage', 'Game simulation'],
+            restrictions: ['None if cleared'],
+            notes: 'Gradual return with monitoring'
+        }
+    ]
+};
+
+function changeView(view) {
+    currentView = view;
+    if (currentTimeline) {
+        renderTimeline();
+    }
+}
+
+document.getElementById('playerSelect').addEventListener('change', function(e) {
+    const playerId = e.target.value;
+    if (playerId) {
+        // In real app, fetch timeline from server
+        // For demo, we'll use sample data
+        const playerName = e.target.options[e.target.selectedIndex].text.split(' - ')[0];
+        currentTimeline = {
+            playerId: playerId,
+            playerName: playerName,
+            injury: 'ACL Reconstruction',
+            startDate: '2024-01-15',
+            phases: treatmentPhases['ACL Reconstruction']
+        };
+        
+        document.getElementById('currentInjury').value = 'ACL Reconstruction';
+        document.getElementById('emptyTimeline').style.display = 'none';
+        document.getElementById('activeTimeline').style.display = 'block';
+        document.getElementById('timelinePlayerName').textContent = playerName;
+        document.getElementById('timelineInjuryInfo').textContent = 
+            `ACL Reconstruction | Started: Jan 15, 2024 | Expected Duration: 9 months`;
+        
+        renderTimeline();
+        updatePhaseStatus();
+        renderRecoveryChart();
+    }
+});
+
+function renderTimeline() {
+    const timelineTrack = document.getElementById('timelineTrack');
+    timelineTrack.innerHTML = '';
+    
+    if (!currentTimeline) return;
+    
+    currentTimeline.phases.forEach((phase, index) => {
+        const phaseCard = document.createElement('div');
+        phaseCard.className = 'phase-card';
+        phaseCard.onclick = () => showPhaseDetails(phase);
+        
+        if (phase.status === 'active') {
+            phaseCard.classList.add('active');
+        }
+        
+        // Calculate days based on duration
+        const durationMatch = phase.duration.match(/Week (\d+)-(\d+)/) || 
+                             phase.duration.match(/Month (\d+)-(\d+)/);
+        let durationText = phase.duration;
+        if (durationMatch) {
+            const unit = phase.duration.includes('Week') ? 'weeks' : 'months';
+            durationText = `${durationMatch[1]}-${durationMatch[2]} ${unit}`;
+        }
+        
+        phaseCard.innerHTML = `
+            <div class="phase-number">${phase.id}</div>
+            <div class="phase-status status-${phase.status}">${phase.status.toUpperCase()}</div>
+            <h6 style="color: var(--text-primary); margin-bottom: 5px;">${phase.name}</h6>
+            <small class="text-muted d-block mb-2">${durationText}</small>
+            <div class="phase-progress">
+                <div class="phase-progress-bar" style="width: ${phase.progress}%"></div>
+            </div>
+            <small class="text-muted">${phase.progress}% complete</small>
+            ${index < currentTimeline.phases.length - 1 ? 
+                `<div class="phase-connector ${phase.status === 'completed' ? 'completed' : ''}"></div>` : ''}
+        `;
+        
+        timelineTrack.appendChild(phaseCard);
+    });
+}
+
+function showPhaseDetails(phase) {
+    const modalBody = document.getElementById('phaseModalBody');
+    
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-md-8">
+                <h5 style="color: var(--text-primary);">${phase.name}</h5>
+                <p class="text-muted">${phase.duration} | Status: <span class="badge status-${phase.status}">${phase.status.toUpperCase()}</span></p>
+                <div class="mb-3">
+                    <h6 style="color: var(--text-primary);">Goals</h6>
+                    <ul class="list-unstyled">
+                        ${phase.goals.map(goal => `<li><i class="bi bi-check-circle-fill text-success me-2"></i>${goal}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color: var(--text-primary);">Recommended Exercises</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        ${phase.exercises.map(ex => `<span class="badge badge-info">${ex}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 style="color: var(--text-primary);">Phase Progress</h6>
+                        <div class="progress mb-3" style="height: 20px;">
+                            <div class="progress-bar" style="width: ${phase.progress}%">${phase.progress}%</div>
+                        </div>
+                        <div class="mb-3">
+                            <h6 style="color: var(--text-primary);">Restrictions</h6>
+                            <small class="text-muted">${phase.restrictions.join(', ')}</small>
+                        </div>
+                        <div class="mb-3">
+                            <h6 style="color: var(--text-primary);">Notes</h6>
+                            <p class="text-muted small">${phase.notes}</p>
+                        </div>
+                        <button class="btn btn-sm btn-primary w-100" onclick="updatePhaseProgress(${phase.id})">
+                            <i class="bi bi-pencil me-1"></i>Update Progress
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const phaseModal = new bootstrap.Modal(document.getElementById('phaseModal'));
+    phaseModal.show();
+}
+
+function updatePhaseStatus() {
+    const statusBody = document.getElementById('phaseStatusBody');
+    statusBody.innerHTML = '';
+    
+    if (!currentTimeline) return;
+    
+    currentTimeline.phases.forEach(phase => {
+        const row = document.createElement('tr');
+        
+        let statusBadge;
+        switch(phase.status) {
+            case 'completed':
+                statusBadge = `<span class="badge badge-success">Completed</span>`;
+                break;
+            case 'active':
+                statusBadge = `<span class="badge badge-primary">Active</span>`;
+                break;
+            case 'delayed':
+                statusBadge = `<span class="badge badge-danger">Delayed</span>`;
+                break;
+            default:
+                statusBadge = `<span class="badge badge-secondary">Planned</span>`;
+        }
+        
+        row.innerHTML = `
+            <td><strong>${phase.name}</strong></td>
+            <td>${statusBadge}</td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                        <div class="progress-bar" style="width: ${phase.progress}%"></div>
+                    </div>
+                    <small>${phase.progress}%</small>
+                </div>
+            </td>
+            <td>${phase.duration}</td>
+        `;
+        statusBody.appendChild(row);
+    });
+}
+
+function renderRecoveryChart() {
+    const ctx = document.getElementById('recoveryChart').getContext('2d');
+    
+    if (window.recoveryChart) {
+        window.recoveryChart.destroy();
+    }
+    
+    if (!currentTimeline) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        return;
+    }
+    
+    // Sample recovery data
+    const phases = currentTimeline.phases;
+    const labels = phases.map(p => p.name);
+    const progressData = phases.map(p => p.progress);
+    const targetData = phases.map((p, i) => Math.min(100, (i + 1) * 20)); // Sample target progression
+    
+    window.recoveryChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Actual Progress',
+                    data: progressData,
+                    borderColor: '#06b6d4',
+                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Target Progress',
+                    data: targetData,
+                    borderColor: '#8b5cf6',
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: getTextColor()
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        color: getTextColor()
+                    },
+                    grid: {
+                        color: getGridColor()
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: getTextColor()
+                    },
+                    grid: {
+                        color: getGridColor()
+                    }
+                }
+            }
+        }
+    });
+}
+
+function getTextColor() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 
+        'rgba(248, 250, 252, 0.8)' : 'rgba(30, 41, 59, 0.9)';
+}
+
+function getGridColor() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 
+        'rgba(148, 163, 184, 0.15)' : 'rgba(15, 23, 42, 0.1)';
+}
+
+function addPhase() {
+    alert('In a real implementation, this would open a form to add a new treatment phase.');
+}
+
+function updatePhaseProgress(phaseId) {
+    const newProgress = prompt('Enter new progress percentage (0-100):', '75');
+    if (newProgress !== null && !isNaN(newProgress)) {
+        const progress = Math.min(100, Math.max(0, parseInt(newProgress)));
+        
+        // Update in memory (in real app, would update on server)
+        const phase = currentTimeline.phases.find(p => p.id === phaseId);
+        if (phase) {
+            phase.progress = progress;
+            if (progress >= 95) phase.status = 'completed';
+            renderTimeline();
+            updatePhaseStatus();
+            renderRecoveryChart();
+            alert('Progress updated successfully!');
+        }
+    }
+}
+
+function createNewTimeline() {
+    const form = document.getElementById('newTimelineForm');
+    if (form.checkValidity()) {
+        const formData = new FormData(form);
+        const timelineData = Object.fromEntries(formData);
+        
+        // In real app, send to server
+        console.log('Creating new timeline:', timelineData);
+        alert('New timeline created successfully!');
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('newTimelineModal'));
+        modal.hide();
+        form.reset();
+    } else {
+        form.reportValidity();
+    }
+}
+
+function exportTimeline() {
+    if (!currentTimeline) {
+        alert('Please select a timeline first');
+        return;
+    }
+    
+    const exportData = {
+        player: currentTimeline.playerName,
+        injury: currentTimeline.injury,
+        phases: currentTimeline.phases,
+        exportDate: new Date().toISOString(),
+        summary: {
+            totalPhases: currentTimeline.phases.length,
+            completedPhases: currentTimeline.phases.filter(p => p.status === 'completed').length,
+            activePhases: currentTimeline.phases.filter(p => p.status === 'active').length,
+            overallProgress: Math.round(currentTimeline.phases.reduce((sum, p) => sum + p.progress, 0) / currentTimeline.phases.length)
+        }
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const exportFileDefaultName = `timeline-${currentTimeline.playerId}-${new Date().toISOString().split('T')[0]}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+}
+</script>
+{% endblock %}

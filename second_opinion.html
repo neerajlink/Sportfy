@@ -1,0 +1,1095 @@
+{% extends 'base.html' %}
+
+{% block title %}Second Opinion - Sports Injury Analysis{% endblock %}
+{% block breadcrumb %}Second Opinion{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 style="color: var(--text-primary);">Second Opinion System</h1>
+        <p style="color: var(--text-secondary);">Virtual consultations with sports medicine specialists worldwide</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newConsultationModal">
+        <i class="bi bi-plus-circle me-2"></i>Request Consultation
+    </button>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-lg-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="ms-3">
+                    <h3 class="mb-0" id="activeConsultations">0</h3>
+                    <span class="text-muted">Active Consultations</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="ms-3">
+                    <h3 class="mb-0" id="completedConsultations">0</h3>
+                    <span class="text-muted">Completed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="ms-3">
+                    <h3 class="mb-0" id="availableSpecialists">0</h3>
+                    <span class="text-muted">Available Specialists</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="ms-3">
+                    <h3 class="mb-0" id="avgResponseTime">24h</h3>
+                    <span class="text-muted">Avg Response Time</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Active Consultations -->
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title">
+                    <i class="bi bi-chat-dots text-primary me-2"></i>Active Consultations
+                </h5>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" onclick="filterConsultations('all')">All</button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="filterConsultations('pending')">Pending</button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="filterConsultations('scheduled')">Scheduled</button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th style="color: var(--text-primary);">Patient</th>
+                                <th style="color: var(--text-primary);">Injury</th>
+                                <th style="color: var(--text-primary);">Specialist</th>
+                                <th style="color: var(--text-primary);">Status</th>
+                                <th style="color: var(--text-primary);">Last Update</th>
+                                <th style="color: var(--text-primary);">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consultationsTableBody">
+                            <!-- Will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Specialist Directory -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-person-badge text-info me-2"></i>Available Specialists
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3" id="specialistsGrid">
+                    <!-- Specialists will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Consultation Chat & Details -->
+    <div class="col-xl-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-chat-left-text text-success me-2"></i>Consultation Details
+                </h5>
+            </div>
+            <div class="card-body" id="consultationDetails">
+                <div class="text-center py-5">
+                    <i class="bi bi-chat-square-heart display-1 text-muted mb-3"></i>
+                    <h5 class="text-muted">No consultation selected</h5>
+                    <p class="text-muted">Select a consultation from the list to view details</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-lightning-charge text-warning me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="scheduleVideoCall()">
+                        <i class="bi bi-camera-video me-2"></i>Schedule Video Call
+                    </button>
+                    <button class="btn btn-secondary" onclick="uploadMedicalRecords()">
+                        <i class="bi bi-upload me-2"></i>Upload Medical Records
+                    </button>
+                    <button class="btn btn-secondary" onclick="viewConsultationHistory()">
+                        <i class="bi bi-clock-history me-2"></i>View History
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="downloadConsultationGuide()">
+                        <i class="bi bi-download me-2"></i>Download Guide
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Consultation History -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="bi bi-calendar2-week text-purple me-2"></i>Recent Consultation History
+        </h5>
+    </div>
+    <div class="card-body">
+        <canvas id="consultationHistoryChart" height="100"></canvas>
+    </div>
+</div>
+
+<!-- Modal for New Consultation -->
+<div class="modal fade" id="newConsultationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request New Consultation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newConsultationForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Patient *</label>
+                                <select class="form-select" name="player_id" required>
+                                    <option value="">Select player...</option>
+                                    {% for player in players %}
+                                    <option value="{{ player.player_id }}">{{ player.first_name }} {{ player.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Injury Type *</label>
+                                <input type="text" class="form-control" name="injury_type" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Preferred Specialist Type</label>
+                                <select class="form-select" name="specialist_type">
+                                    <option value="orthopedic">Orthopedic Surgeon</option>
+                                    <option value="sports_medicine">Sports Medicine Physician</option>
+                                    <option value="physiotherapist">Physiotherapist</option>
+                                    <option value="radiologist">Radiologist</option>
+                                    <option value="neurologist">Neurologist</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Urgency *</label>
+                                <select class="form-select" name="urgency" required>
+                                    <option value="routine">Routine (7-14 days)</option>
+                                    <option value="urgent">Urgent (3-7 days)</option>
+                                    <option value="emergency">Emergency (24-48 hours)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Preferred Language</label>
+                                <select class="form-select" name="language">
+                                    <option value="english">English</option>
+                                    <option value="spanish">Spanish</option>
+                                    <option value="french">French</option>
+                                    <option value="german">German</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Time Zone</label>
+                                <select class="form-select" name="timezone">
+                                    <option value="est">EST (Eastern Time)</option>
+                                    <option value="pst">PST (Pacific Time)</option>
+                                    <option value="cst">CST (Central Time)</option>
+                                    <option value="gmt">GMT (London)</option>
+                                    <option value="cet">CET (Central Europe)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Consultation Reason *</label>
+                        <textarea class="form-control" name="reason" rows="3" required 
+                                  placeholder="Describe why you're seeking a second opinion..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Medical History Summary</label>
+                        <textarea class="form-control" name="medical_history" rows="3" 
+                                  placeholder="Brief summary of relevant medical history..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Current Treatment Plan</label>
+                        <textarea class="form-control" name="current_treatment" rows="2" 
+                                  placeholder="Current treatment being followed..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="attach_records" id="attachRecords">
+                            <label class="form-check-label" for="attachRecords">
+                                Attach medical records (X-rays, MRI reports, etc.)
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitConsultationRequest()">Submit Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Upload Files -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Medical Records</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm">
+                    <div class="mb-3">
+                        <label class="form-label">Select Files</label>
+                        <input type="file" class="form-control" id="medicalFiles" multiple accept=".pdf,.jpg,.jpeg,.png,.dicom">
+                        <small class="text-muted">Supported formats: PDF, JPG, PNG, DICOM (Max 10MB each)</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">File Type</label>
+                        <select class="form-select" id="fileType">
+                            <option value="xray">X-Ray</option>
+                            <option value="mri">MRI Scan</option>
+                            <option value="ct">CT Scan</option>
+                            <option value="ultrasound">Ultrasound</option>
+                            <option value="lab_results">Lab Results</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="fileDescription" rows="2" 
+                                  placeholder="Brief description of the file contents..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="shareWithSpecialist">
+                            <label class="form-check-label" for="shareWithSpecialist">
+                                Share with assigned specialist
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="uploadFiles()">Upload Files</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Video Call Schedule -->
+<div class="modal fade" id="videoCallModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Schedule Video Consultation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="videoCallForm">
+                    <div class="mb-3">
+                        <label class="form-label">Select Date *</label>
+                        <input type="date" class="form-control" id="callDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Time *</label>
+                        <select class="form-select" id="callTime" required>
+                            <option value="">Select time...</option>
+                            <option value="09:00">9:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="13:00">1:00 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="15:00">3:00 PM</option>
+                            <option value="16:00">4:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Duration</label>
+                        <select class="form-select" id="callDuration">
+                            <option value="30">30 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60" selected>60 minutes</option>
+                            <option value="90">90 minutes</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Meeting Platform</label>
+                        <select class="form-select" id="meetingPlatform">
+                            <option value="zoom">Zoom</option>
+                            <option value="teams">Microsoft Teams</option>
+                            <option value="google_meet">Google Meet</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Agenda / Topics to Discuss</label>
+                        <textarea class="form-control" id="callAgenda" rows="3" 
+                                  placeholder="What specific topics would you like to discuss?"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="scheduleCall()">Schedule Call</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.consultation-card {
+    background: var(--bg-card-solid);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.consultation-card:hover {
+    border-color: var(--primary);
+    transform: translateX(5px);
+}
+
+.consultation-card.active {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+.specialist-card {
+    background: var(--bg-card-solid);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.specialist-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 25px rgba(6, 182, 212, 0.2);
+}
+
+.specialist-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.specialist-rating {
+    color: #f59e0b;
+    font-size: 0.9rem;
+}
+
+.chat-message {
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 80%;
+}
+
+.chat-message.specialist {
+    background: rgba(6, 182, 212, 0.1);
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+}
+
+.chat-message.user {
+    background: rgba(139, 92, 246, 0.1);
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+    margin-left: auto;
+}
+
+.status-badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-pending { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.status-scheduled { background: rgba(6, 182, 212, 0.15); color: var(--primary); }
+.status-in-progress { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+-status-completed { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.status-cancelled { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+</style>
+
+<script>
+// Sample data
+let consultations = [
+    {
+        id: 1,
+        player_id: 'PLY00001',
+        player_name: 'John Smith',
+        injury_type: 'ACL Reconstruction',
+        specialist_id: 'SP001',
+        specialist_name: 'Dr. Sarah Chen',
+        specialist_type: 'Orthopedic Surgeon',
+        status: 'scheduled',
+        urgency: 'urgent',
+        created_date: '2024-02-01',
+        last_update: '2024-02-05',
+        scheduled_date: '2024-02-10',
+        scheduled_time: '14:00',
+        reason: 'Second opinion on surgical approach and recovery timeline',
+        medical_history: 'Previous knee surgery in 2020',
+        current_treatment: 'Post-op week 6, following standard ACL protocol',
+        messages: [
+            { sender: 'specialist', text: 'Hello John, I\'ve reviewed your MRI scans. Can you tell me more about your current range of motion?', timestamp: '2024-02-05 10:30' },
+            { sender: 'user', text: 'I can bend to about 90 degrees, but extension is still limited to -5 degrees.', timestamp: '2024-02-05 14:15' },
+            { sender: 'specialist', text: 'That\'s expected at this stage. I recommend focusing on extension exercises. Let\'s discuss during our video call.', timestamp: '2024-02-05 16:45' }
+        ],
+        attachments: ['mri_report.pdf', 'xray_1.jpg']
+    },
+    {
+        id: 2,
+        player_id: 'PLY00002',
+        player_name: 'Mike Davis',
+        injury_type: 'Rotator Cuff Tear',
+        specialist_id: 'SP002',
+        specialist_name: 'Dr. James Wilson',
+        specialist_type: 'Sports Medicine Physician',
+        status: 'in-progress',
+        urgency: 'routine',
+        created_date: '2024-01-25',
+        last_update: '2024-02-03',
+        reason: 'Conservative treatment vs surgery decision',
+        medical_history: 'No previous shoulder injuries',
+        current_treatment: 'Physical therapy 3x weekly',
+        messages: [
+            { sender: 'specialist', text: 'Based on your imaging, you have a partial thickness tear. Have you tried corticosteroid injections?', timestamp: '2024-02-03 09:20' }
+        ],
+        attachments: ['mri_shoulder.pdf']
+    }
+];
+
+const specialists = [
+    {
+        id: 'SP001',
+        name: 'Dr. Sarah Chen',
+        specialty: 'Orthopedic Surgery',
+        sub_specialty: 'Knee & Shoulder',
+        experience: '15 years',
+        hospital: 'Mayo Clinic',
+        rating: 4.9,
+        reviews: 128,
+        availability: 'Available this week',
+        languages: ['English', 'Mandarin'],
+        consultation_fee: '$350'
+    },
+    {
+        id: 'SP002',
+        name: 'Dr. James Wilson',
+        specialty: 'Sports Medicine',
+        sub_specialty: 'Non-surgical Treatment',
+        experience: '12 years',
+        hospital: 'Hospital for Special Surgery',
+        rating: 4.8,
+        reviews: 94,
+        availability: 'Available next week',
+        languages: ['English', 'Spanish'],
+        consultation_fee: '$300'
+    },
+    {
+        id: 'SP003',
+        name: 'Dr. Maria Rodriguez',
+        specialty: 'Physical Therapy',
+        sub_specialty: 'Rehabilitation',
+        experience: '10 years',
+        hospital: 'UCLA Health',
+        rating: 4.7,
+        reviews: 76,
+        availability: 'Available tomorrow',
+        languages: ['English', 'Spanish', 'Portuguese'],
+        consultation_fee: '$250'
+    },
+    {
+        id: 'SP004',
+        name: 'Dr. David Kim',
+        specialty: 'Radiology',
+        sub_specialty: 'Musculoskeletal Imaging',
+        experience: '8 years',
+        hospital: 'Johns Hopkins',
+        rating: 4.9,
+        reviews: 56,
+        availability: 'Available in 2 days',
+        languages: ['English', 'Korean'],
+        consultation_fee: '$275'
+    }
+];
+
+let currentConsultationId = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadConsultations();
+    loadSpecialists();
+    updateStats();
+    renderConsultationHistoryChart();
+});
+
+function loadConsultations() {
+    renderConsultationsTable();
+}
+
+function loadSpecialists() {
+    const grid = document.getElementById('specialistsGrid');
+    grid.innerHTML = '';
+    
+    specialists.forEach(specialist => {
+        const card = document.createElement('div');
+        card.className = 'col-lg-6';
+        
+        card.innerHTML = `
+            <div class="specialist-card">
+                <div class="specialist-avatar">
+                    ${specialist.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <h6 style="color: var(--text-primary); margin-bottom: 5px;">${specialist.name}</h6>
+                <small class="text-muted d-block mb-2">${specialist.specialty}</small>
+                <div class="specialist-rating mb-2">
+                    ${'★'.repeat(Math.floor(specialist.rating))}${specialist.rating % 1 >= 0.5 ? '½' : ''}
+                    <small class="text-muted ms-1">(${specialist.reviews})</small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="text-muted">${specialist.experience} exp</small>
+                    <small class="text-success">${specialist.consultation_fee}</small>
+                </div>
+                <small class="text-muted d-block mb-3">${specialist.availability}</small>
+                <button class="btn btn-sm btn-outline-primary w-100" onclick="requestSpecialist('${specialist.id}')">
+                    <i class="bi bi-calendar-plus me-1"></i>Request
+                </button>
+            </div>
+        `;
+        
+        grid.appendChild(card);
+    });
+}
+
+function renderConsultationsTable() {
+    const tbody = document.getElementById('consultationsTableBody');
+    tbody.innerHTML = '';
+    
+    if (consultations.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-4">
+                    <i class="bi bi-chat-square display-1 text-muted mb-3"></i>
+                    <h5 class="text-muted">No consultations yet</h5>
+                    <p class="text-muted">Start by requesting a consultation with a specialist</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    consultations.forEach(consultation => {
+        const row = document.createElement('tr');
+        row.className = 'consultation-row';
+        row.onclick = () => showConsultationDetails(consultation.id);
+        
+        if (currentConsultationId === consultation.id) {
+            row.classList.add('table-active');
+        }
+        
+        const statusBadge = `<span class="status-badge status-${consultation.status}">${consultation.status.replace('-', ' ').toUpperCase()}</span>`;
+        
+        row.innerHTML = `
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; background: var(--gradient-primary); color: white; font-size: 0.8rem; font-weight: 600;">
+                        ${consultation.player_name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    ${consultation.player_name}
+                </div>
+            </td>
+            <td>${consultation.injury_type}</td>
+            <td>${consultation.specialist_name || 'Not assigned'}</td>
+            <td>${statusBadge}</td>
+            <td>${formatDate(consultation.last_update)}</td>
+            <td>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" onclick="event.stopPropagation(); showConsultationDetails(${consultation.id})">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-outline-success" onclick="event.stopPropagation(); sendMessage(${consultation.id})">
+                        <i class="bi bi-chat"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+function showConsultationDetails(consultationId) {
+    const consultation = consultations.find(c => c.id === consultationId);
+    if (!consultation) return;
+    
+    currentConsultationId = consultationId;
+    
+    // Update active row
+    document.querySelectorAll('.consultation-row').forEach(row => {
+        row.classList.remove('table-active');
+    });
+    event.target.closest('tr').classList.add('table-active');
+    
+    const detailsContainer = document.getElementById('consultationDetails');
+    
+    // Format messages
+    const messagesHtml = consultation.messages.map(msg => `
+        <div class="chat-message ${msg.sender}">
+            <div class="d-flex justify-content-between">
+                <small><strong>${msg.sender === 'specialist' ? consultation.specialist_name : 'You'}</strong></small>
+                <small class="text-muted">${formatDateTime(msg.timestamp)}</small>
+            </div>
+            <p class="mb-0">${msg.text}</p>
+        </div>
+    `).join('');
+    
+    // Format attachments
+    const attachmentsHtml = consultation.attachments && consultation.attachments.length > 0 ?
+        consultation.attachments.map(file => `
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div>
+                    <i class="bi bi-file-earmark-text me-2"></i>
+                    <small>${file}</small>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary" onclick="downloadFile('${file}')">
+                    <i class="bi bi-download"></i>
+                </button>
+            </div>
+        `).join('') : '<p class="text-muted small">No attachments</p>';
+    
+    detailsContainer.innerHTML = `
+        <div class="mb-4">
+            <h5 style="color: var(--text-primary);">${consultation.player_name} - ${consultation.injury_type}</h5>
+            <p class="text-muted">${consultation.specialist_name || 'Specialist not assigned yet'}</p>
+        </div>
+        
+        <div class="mb-4">
+            <h6 style="color: var(--text-primary);">Consultation Details</h6>
+            <table class="table table-sm">
+                <tr>
+                    <td><strong>Status:</strong></td>
+                    <td><span class="status-badge status-${consultation.status}">${consultation.status.replace('-', ' ').toUpperCase()}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Urgency:</strong></td>
+                    <td>${consultation.urgency}</td>
+                </tr>
+                <tr>
+                    <td><strong>Created:</strong></td>
+                    <td>${formatDate(consultation.created_date)}</td>
+                </tr>
+                ${consultation.scheduled_date ? `
+                <tr>
+                    <td><strong>Scheduled:</strong></td>
+                    <td>${formatDate(consultation.scheduled_date)} at ${consultation.scheduled_time}</td>
+                </tr>
+                ` : ''}
+            </table>
+        </div>
+        
+        <div class="mb-4">
+            <h6 style="color: var(--text-primary);">Messages</h6>
+            <div class="chat-container" style="max-height: 300px; overflow-y: auto;">
+                ${messagesHtml}
+            </div>
+            <div class="mt-3">
+                <textarea class="form-control mb-2" id="newMessage" rows="2" placeholder="Type your message..."></textarea>
+                <button class="btn btn-primary btn-sm" onclick="sendNewMessage(${consultation.id})">
+                    <i class="bi bi-send me-1"></i>Send Message
+                </button>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <h6 style="color: var(--text-primary);">Attachments</h6>
+            <div class="attachments-container">
+                ${attachmentsHtml}
+            </div>
+        </div>
+    `;
+}
+
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+    });
+}
+
+function formatDateTime(dateTimeStr) {
+    const date = new Date(dateTimeStr);
+    return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function updateStats() {
+    const active = consultations.filter(c => ['pending', 'scheduled', 'in-progress'].includes(c.status)).length;
+    const completed = consultations.filter(c => c.status === 'completed').length;
+    
+    document.getElementById('activeConsultations').textContent = active;
+    document.getElementById('completedConsultations').textContent = completed;
+    document.getElementById('availableSpecialists').textContent = specialists.length;
+}
+
+function filterConsultations(filter) {
+    const rows = document.querySelectorAll('.consultation-row');
+    
+    rows.forEach(row => {
+        const statusCell = row.cells[3];
+        const statusText = statusCell.textContent.trim().toLowerCase();
+        
+        if (filter === 'all') {
+            row.style.display = '';
+        } else if (filter === 'pending' && statusText.includes('pending')) {
+            row.style.display = '';
+        } else if (filter === 'scheduled' && statusText.includes('scheduled')) {
+            row.style.display = '';
+        } else if (filter === 'all') {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function submitConsultationRequest() {
+    const form = document.getElementById('newConsultationForm');
+    if (form.checkValidity()) {
+        const formData = new FormData(form);
+        const consultationData = Object.fromEntries(formData);
+        
+        // Create new consultation
+        const newConsultation = {
+            id: consultations.length + 1,
+            player_id: consultationData.player_id,
+            player_name: form.querySelector('[name="player_id"] option:checked').text,
+            injury_type: consultationData.injury_type,
+            specialist_id: null,
+            specialist_name: null,
+            specialist_type: consultationData.specialist_type,
+            status: 'pending',
+            urgency: consultationData.urgency,
+            created_date: new Date().toISOString().split('T')[0],
+            last_update: new Date().toISOString().split('T')[0],
+            reason: consultationData.reason,
+            medical_history: consultationData.medical_history || '',
+            current_treatment: consultationData.current_treatment || '',
+            messages: [],
+            attachments: []
+        };
+        
+        consultations.push(newConsultation);
+        
+        // Update UI
+        loadConsultations();
+        updateStats();
+        
+        // Close modal and reset form
+        const modal = bootstrap.Modal.getInstance(document.getElementById('newConsultationModal'));
+        modal.hide();
+        form.reset();
+        
+        alert('Consultation request submitted successfully! A specialist will be assigned within 24 hours.');
+    } else {
+        form.reportValidity();
+    }
+}
+
+function requestSpecialist(specialistId) {
+    const specialist = specialists.find(s => s.id === specialistId);
+    if (specialist) {
+        document.querySelector('[name="specialist_type"]').value = specialist.specialty.toLowerCase().replace(/ /g, '_');
+        const modal = new bootstrap.Modal(document.getElementById('newConsultationModal'));
+        modal.show();
+    }
+}
+
+function sendMessage(consultationId) {
+    showConsultationDetails(consultationId);
+    document.getElementById('newMessage').focus();
+}
+
+function sendNewMessage(consultationId) {
+    const messageInput = document.getElementById('newMessage');
+    const messageText = messageInput.value.trim();
+    
+    if (!messageText) return;
+    
+    const consultation = consultations.find(c => c.id === consultationId);
+    if (consultation) {
+        const newMessage = {
+            sender: 'user',
+            text: messageText,
+            timestamp: new Date().toISOString()
+        };
+        
+        consultation.messages.push(newMessage);
+        consultation.last_update = new Date().toISOString().split('T')[0];
+        
+        // Update UI
+        showConsultationDetails(consultationId);
+        messageInput.value = '';
+        
+        // Simulate specialist response after 2 seconds
+        setTimeout(() => {
+            const responses = [
+                "Thank you for your message. I'll review this information before our call.",
+                "That's helpful information. Let me check my schedule and get back to you.",
+                "I understand your concern. Based on what you've described, I recommend..."
+            ];
+            
+            const response = {
+                sender: 'specialist',
+                text: responses[Math.floor(Math.random() * responses.length)],
+                timestamp: new Date().toISOString()
+            };
+            
+            consultation.messages.push(response);
+            consultation.last_update = new Date().toISOString().split('T')[0];
+            showConsultationDetails(consultationId);
+        }, 2000);
+    }
+}
+
+function uploadMedicalRecords() {
+    const modal = new bootstrap.Modal(document.getElementById('uploadModal'));
+    modal.show();
+}
+
+function uploadFiles() {
+    const files = document.getElementById('medicalFiles').files;
+    if (files.length === 0) {
+        alert('Please select files to upload');
+        return;
+    }
+    
+    // In real app, upload to server
+    const fileNames = Array.from(files).map(file => file.name);
+    
+    if (currentConsultationId) {
+        const consultation = consultations.find(c => c.id === currentConsultationId);
+        if (consultation) {
+            consultation.attachments = [...consultation.attachments, ...fileNames];
+            showConsultationDetails(currentConsultationId);
+        }
+    }
+    
+    alert(`${files.length} file(s) uploaded successfully!`);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+    modal.hide();
+    document.getElementById('uploadForm').reset();
+}
+
+function scheduleVideoCall() {
+    if (!currentConsultationId) {
+        alert('Please select a consultation first');
+        return;
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('videoCallModal'));
+    modal.show();
+}
+
+function scheduleCall() {
+    const form = document.getElementById('videoCallForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const consultation = consultations.find(c => c.id === currentConsultationId);
+    if (consultation) {
+        consultation.scheduled_date = document.getElementById('callDate').value;
+        consultation.scheduled_time = document.getElementById('callTime').value;
+        consultation.status = 'scheduled';
+        
+        // Add system message
+        consultation.messages.push({
+            sender: 'system',
+            text: `Video consultation scheduled for ${formatDate(consultation.scheduled_date)} at ${consultation.scheduled_time}`,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Update UI
+        loadConsultations();
+        showConsultationDetails(currentConsultationId);
+        updateStats();
+        
+        alert('Video consultation scheduled successfully! A calendar invitation will be sent.');
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('videoCallModal'));
+        modal.hide();
+        form.reset();
+    }
+}
+
+function viewConsultationHistory() {
+    alert('In a real implementation, this would show a complete history of all consultations.');
+}
+
+function downloadConsultationGuide() {
+    const guideContent = `
+Second Opinion Consultation Guide
+=================================
+
+Preparing for Your Consultation:
+1. Gather all medical records (MRI, X-ray, CT scans)
+2. Prepare a list of current medications
+3. Note down your symptoms and when they started
+4. Prepare questions for the specialist
+
+During the Consultation:
+1. Be honest about your symptoms and concerns
+2. Ask about treatment options and alternatives
+3. Discuss risks and benefits of each approach
+4. Understand the expected recovery timeline
+
+After the Consultation:
+1. Review the specialist's recommendations
+2. Share the findings with your primary doctor
+3. Follow up with any additional questions
+4. Schedule any recommended tests or follow-ups
+
+Remember: A second opinion is meant to provide additional perspective, not necessarily to override your current treatment plan.
+    `;
+    
+    const blob = new Blob([guideContent], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'second-opinion-guide.txt';
+    a.click();
+}
+
+function downloadFile(filename) {
+    alert(`In a real implementation, this would download: ${filename}`);
+}
+
+function renderConsultationHistoryChart() {
+    const ctx = document.getElementById('consultationHistoryChart').getContext('2d');
+    
+    // Sample data for last 6 months
+    const months = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
+    const consultationCounts = [3, 5, 4, 6, 8, 7]; // Sample data
+    
+    if (window.consultationHistoryChart) {
+        window.consultationHistoryChart.destroy();
+    }
+    
+    window.consultationHistoryChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Consultations',
+                data: consultationCounts,
+                borderColor: '#06b6d4',
+                backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: 'var(--text-muted)'
+                    },
+                    grid: {
+                        color: 'var(--border-light)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: 'var(--text-muted)'
+                    },
+                    grid: {
+                        color: 'var(--border-light)'
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

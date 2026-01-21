@@ -1,0 +1,601 @@
+{% extends 'base.html' %}
+
+{% block title %}Statistics - Sports Injury Analysis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="mb-2" style="font-weight: 700; color: var(--text-primary);">Statistical Analysis</h1>
+    <p style="color: var(--text-secondary);">Comprehensive statistical insights from 2000 player records</p>
+</div>
+
+<!-- Key Statistics -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.total_players }}</h3>
+                <p>Total Players</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="bi bi-calendar3"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.avg_age }}</h3>
+                <p>Average Age</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon red">
+                <i class="bi bi-bandaid-fill"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.total_injuries }}</h3>
+                <p>Total Injuries</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.high_risk_count }}</h3>
+                <p>High Risk Players</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Detailed Stats -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-bar-chart-steps text-primary me-2"></i>Detailed Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="p-3 rounded text-center" style="background: var(--bg-tertiary);">
+                            <h4 class="mb-0" style="color: var(--primary);">{{ stats.avg_height }}</h4>
+                            <small style="color: var(--text-secondary);">Avg Height (cm)</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded text-center" style="background: var(--bg-tertiary);">
+                            <h4 class="mb-0" style="color: var(--secondary);">{{ stats.avg_weight }}</h4>
+                            <small style="color: var(--text-secondary);">Avg Weight (kg)</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded text-center" style="background: var(--bg-tertiary);">
+                            <h4 class="mb-0" style="color: #10b981;">{{ stats.avg_bmi }}</h4>
+                            <small style="color: var(--text-secondary);">Average BMI</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded text-center" style="background: var(--bg-tertiary);">
+                            <h4 class="mb-0" style="color: #f59e0b;">{{ stats.avg_training_hours }}</h4>
+                            <small style="color: var(--text-secondary);">Avg Training Hrs/Week</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded text-center" style="background: var(--bg-tertiary);">
+                            <h4 class="mb-0" style="color: #ef4444;">{{ stats.avg_injuries_per_player }}</h4>
+                            <small style="color: var(--text-secondary);">Avg Injuries/Player</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded text-center" style="background: var(--bg-tertiary);">
+                            <h4 class="mb-0" style="color: #ec4899;">{{ stats.avg_days_missed }}</h4>
+                            <small style="color: var(--text-secondary);">Avg Days Missed</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded text-center" style="background: var(--bg-tertiary);">
+                            <h4 class="mb-0" style="color: var(--primary);">{{ stats.total_surgeries }}</h4>
+                            <small style="color: var(--text-secondary);">Total Surgeries</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded text-center" style="background: var(--bg-tertiary);">
+                            <h4 class="mb-0" style="color: var(--secondary);">{{ stats.chronic_conditions_count }}</h4>
+                            <small style="color: var(--text-secondary);">Chronic Conditions</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Performance Metrics -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-speedometer text-success me-2"></i>Performance Metrics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: var(--text-primary);">Average Fitness Level</span>
+                        <strong style="color: var(--text-primary);">{{ stats.avg_fitness }}%</strong>
+                    </div>
+                    <div class="progress" style="height: 12px;">
+                        <div class="progress-bar" style="width: {{ stats.avg_fitness }}%"></div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: var(--text-primary);">Average Performance Index</span>
+                        <strong style="color: var(--text-primary);">{{ stats.avg_performance }}%</strong>
+                    </div>
+                    <div class="progress" style="height: 12px;">
+                        <div class="progress-bar" style="width: {{ stats.avg_performance }}%; background: linear-gradient(90deg, #7c3aed, #ec4899);"></div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: var(--text-primary);">Average Risk Score</span>
+                        <strong style="color: var(--text-primary);">{{ (stats.avg_risk_score * 100)|round(1) }}%</strong>
+                    </div>
+                    <div class="progress" style="height: 12px;">
+                        <div class="progress-bar" style="width: {{ stats.avg_risk_score * 100 }}%; background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: var(--text-primary);">Currently Injured Rate</span>
+                        <strong style="color: var(--text-primary);">{{ ((stats.currently_injured / stats.total_players) * 100)|round(1) }}%</strong>
+                    </div>
+                    <div class="progress" style="height: 12px;">
+                        <div class="progress-bar" style="width: {{ (stats.currently_injured / stats.total_players) * 100 }}%; background: #ef4444;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Correlation Analysis -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-diagram-3 text-warning me-2"></i>Correlation Analysis
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="color: var(--text-primary);">Variables</th>
+                                <th style="color: var(--text-primary);">Correlation</th>
+                                <th style="color: var(--text-primary);">Strength</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="color: var(--text-secondary);">Age vs Injuries</td>
+                                <td style="color: var(--text-primary);">{{ correlations.age_vs_injuries }}</td>
+                                <td>
+                                    {% if correlations.age_vs_injuries|abs > 0.5 %}
+                                    <span class="badge badge-danger">Strong</span>
+                                    {% elif correlations.age_vs_injuries|abs > 0.3 %}
+                                    <span class="badge badge-warning">Moderate</span>
+                                    {% else %}
+                                    <span class="badge badge-success">Weak</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--text-secondary);">Training vs Risk</td>
+                                <td style="color: var(--text-primary);">{{ correlations.training_vs_risk }}</td>
+                                <td>
+                                    {% if correlations.training_vs_risk|abs > 0.5 %}
+                                    <span class="badge badge-danger">Strong</span>
+                                    {% elif correlations.training_vs_risk|abs > 0.3 %}
+                                    <span class="badge badge-warning">Moderate</span>
+                                    {% else %}
+                                    <span class="badge badge-success">Weak</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--text-secondary);">BMI vs Injuries</td>
+                                <td style="color: var(--text-primary);">{{ correlations.bmi_vs_injuries }}</td>
+                                <td>
+                                    {% if correlations.bmi_vs_injuries|abs > 0.5 %}
+                                    <span class="badge badge-danger">Strong</span>
+                                    {% elif correlations.bmi_vs_injuries|abs > 0.3 %}
+                                    <span class="badge badge-warning">Moderate</span>
+                                    {% else %}
+                                    <span class="badge badge-success">Weak</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--text-secondary);">Fitness vs Performance</td>
+                                <td style="color: var(--text-primary);">{{ correlations.fitness_vs_performance }}</td>
+                                <td>
+                                    {% if correlations.fitness_vs_performance|abs > 0.5 %}
+                                    <span class="badge badge-danger">Strong</span>
+                                    {% elif correlations.fitness_vs_performance|abs > 0.3 %}
+                                    <span class="badge badge-warning">Moderate</span>
+                                    {% else %}
+                                    <span class="badge badge-success">Weak</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--text-secondary);">Age vs Risk Score</td>
+                                <td style="color: var(--text-primary);">{{ correlations.age_vs_risk }}</td>
+                                <td>
+                                    {% if correlations.age_vs_risk|abs > 0.5 %}
+                                    <span class="badge badge-danger">Strong</span>
+                                    {% elif correlations.age_vs_risk|abs > 0.3 %}
+                                    <span class="badge badge-warning">Moderate</span>
+                                    {% else %}
+                                    <span class="badge badge-success">Weak</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--text-secondary);">Years Pro vs Injuries</td>
+                                <td style="color: var(--text-primary);">{{ correlations.years_pro_vs_injuries }}</td>
+                                <td>
+                                    {% if correlations.years_pro_vs_injuries|abs > 0.5 %}
+                                    <span class="badge badge-danger">Strong</span>
+                                    {% elif correlations.years_pro_vs_injuries|abs > 0.3 %}
+                                    <span class="badge badge-warning">Moderate</span>
+                                    {% else %}
+                                    <span class="badge badge-success">Weak</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Sports by Injuries -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-trophy-fill text-danger me-2"></i>Top Sports by Total Injuries
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="color: var(--text-primary);">Sport</th>
+                                <th style="color: var(--text-primary);">Total Injuries</th>
+                                <th style="color: var(--text-primary);">Avg per Player</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sport, injuries in top_sports.items() %}
+                            {% set sport_stat = sport_stats.get(sport, {}) %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="sport-icon me-2">{{ sport[:1] }}</div>
+                                        {{ sport }}
+                                    </div>
+                                </td>
+                                <td>{{ injuries }}</td>
+                                <td>
+                                    {{ sport_stat.get('avg_injuries', 0)|round(1) if sport_stat else 0 }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Treatment Success Rates -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-heart-pulse text-info me-2"></i>Treatment Success Rates
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="color: var(--text-primary);">Treatment Type</th>
+                                <th style="color: var(--text-primary);">Avg Progress</th>
+                                <th style="color: var(--text-primary);">Patients</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for treatment, data in treatment_success.items() %}
+                            <tr>
+                                <td>{{ treatment }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {{ data.avg_progress }}%
+                                        <div class="ms-2" style="width: 60px;">
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar" style="width: {{ data.avg_progress }}%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ data.patient_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Gender Distribution -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-gender-ambiguous text-purple me-2"></i>Gender Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="text-center p-3">
+                            <h2 class="text-primary mb-1">{{ gender_dist.get('Male', 0) }}</h2>
+                            <small class="text-muted">Male Players</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center p-3">
+                            <h2 class="text-purple mb-1">{{ gender_dist.get('Female', 0) }}</h2>
+                            <small class="text-muted">Female Players</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: var(--text-primary);">Male Average Risk</span>
+                        <strong style="color: var(--text-primary);">{{ ((gender_stats.get('Male', {}).get('risk_score', 0)) * 100)|round(1) if gender_stats.get('Male') else 0 }}%</strong>
+                    </div>
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar" style="width: {{ (gender_stats.get('Male', {}).get('risk_score', 0) * 100) if gender_stats.get('Male') else 0 }}%; background: var(--primary);"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: var(--text-primary);">Female Average Risk</span>
+                        <strong style="color: var(--text-primary);">{{ ((gender_stats.get('Female', {}).get('risk_score', 0)) * 100)|round(1) if gender_stats.get('Female') else 0 }}%</strong>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar" style="width: {{ (gender_stats.get('Female', {}).get('risk_score', 0) * 100) if gender_stats.get('Female') else 0 }}%; background: #ec4899;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Country Distribution -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-globe-americas text-success me-2"></i>Top 15 Countries
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="color: var(--text-primary);">Country</th>
+                                <th style="color: var(--text-primary);">Players</th>
+                                <th style="color: var(--text-primary);">Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for country, count in country_dist.items() %}
+                            <tr>
+                                <td>{{ country }}</td>
+                                <td>{{ count }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {{ ((count / stats.total_players) * 100)|round(1) }}%
+                                        <div class="ms-2" style="width: 80px;">
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar" style="width: {{ (count / stats.total_players) * 100 }}%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sport Statistics -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="bi bi-graph-up text-primary me-2"></i>Detailed Sport Statistics
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="color: var(--text-primary);">Sport</th>
+                        <th style="color: var(--text-primary);">Players</th>
+                        <th style="color: var(--text-primary);">Avg Age</th>
+                        <th style="color: var(--text-primary);">Avg Injuries</th>
+                        <th style="color: var(--text-primary);">Total Injuries</th>
+                        <th style="color: var(--text-primary);">Avg Risk</th>
+                        <th style="color: var(--text-primary);">Avg Fitness</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sport, data in sport_stats.items() %}
+                    <tr>
+                        <td><strong>{{ sport }}</strong></td>
+                        <td>{{ data.get('player_count', 0) if data.get('player_count') else ((data.get('total_injuries', 0) / data.get('avg_injuries', 1))|round|int if data.get('avg_injuries', 0) > 0 else 0) }}</td>
+                        <td>{{ data.avg_age|round(1) if data.avg_age else 0 }}</td>
+                        <td>{{ data.avg_injuries|round(1) if data.avg_injuries else 0 }}</td>
+                        <td>{{ data.total_injuries|int if data.total_injuries else 0 }}</td>
+                        <td>
+                            <span class="badge {% if data.avg_risk > 0.6 %}badge-danger{% elif data.avg_risk > 0.4 %}badge-warning{% else %}badge-success{% endif %}">
+                                {{ data.avg_risk|round(2) if data.avg_risk else 0 }}
+                            </span>
+                        </td>
+                        <td>{{ data.avg_fitness|round(1) if data.avg_fitness else 0 }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.stat-card {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 24px;
+}
+
+.stat-icon.blue {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.stat-icon.purple {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+}
+
+.stat-icon.red {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.stat-icon.orange {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.stat-info h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.stat-info p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.sport-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.progress {
+    border-radius: 10px;
+    background: var(--bg-tertiary);
+}
+
+.progress-bar {
+    border-radius: 10px;
+    background: var(--primary);
+}
+
+.badge-success {
+    background: #10b981;
+    color: white;
+}
+
+.badge-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.badge-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.table th {
+    color: var(--text-primary);
+}
+
+.table td {
+    color: var(--text-secondary);
+}
+
+.table td strong {
+    color: var(--text-primary);
+}
+</style>
+{% endblock %}

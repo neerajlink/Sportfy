@@ -1,0 +1,414 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - Sports Injury Analysis{% endblock %}
+{% block breadcrumb %}Reports{% endblock %}
+
+{% block content %}
+<!-- Monthly Report Summary -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(6, 182, 212, 0.3);">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h3 class="text-white mb-2">
+                            <i class="bi bi-file-earmark-bar-graph me-2"></i>
+                            Monthly Report: {{ monthly_report.month }}
+                        </h3>
+                        <p class="text-white-50">Comprehensive injury analysis and performance metrics</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h2 class="text-gradient mb-0">{{ monthly_report.total_players }}</h2>
+                                <small class="text-white-50">Total Players</small>
+                            </div>
+                            <div class="col-4">
+                                <h2 class="text-warning mb-0">{{ monthly_report.currently_injured }}</h2>
+                                <small class="text-white-50">Currently Injured</small>
+                            </div>
+                            <div class="col-4">
+                                <h2 class="text-danger mb-0">{{ monthly_report.injury_rate }}%</h2>
+                                <small class="text-white-50">Injury Rate</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <div class="ms-3">
+                    <h3 class="mb-0">{{ monthly_report.avg_risk_score }}</h3>
+                    <span class="text-muted">Avg Risk Score</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="ms-3">
+                    <h3 class="mb-0">{{ monthly_report.high_risk_count }}</h3>
+                    <span class="text-muted">High Risk Players</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+                <div class="ms-3">
+                    <h3 class="mb-0">{{ monthly_report.fully_recovered }}</h3>
+                    <span class="text-muted">Fully Recovered</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+                <div class="ms-3">
+                    <h3 class="mb-0">{{ monthly_report.in_recovery }}</h3>
+                    <span class="text-muted">In Recovery</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Injury Summary by Sport -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-table text-primary"></i>
+                    Injury Summary by Sport
+                </h5>
+                <button class="btn btn-sm btn-primary" onclick="exportTable('injurySummaryTable')">
+                    <i class="bi bi-download me-1"></i>Export
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="injurySummaryTable">
+                        <thead>
+                            <tr>
+                                <th>Sport</th>
+                                <th>Player Count</th>
+                                <th>Total Injuries</th>
+                                <th>Avg Injuries</th>
+                                <th>Avg Risk</th>
+                                <th>Risk Std</th>
+                                <th>Days Missed</th>
+                                <th>Avg Rehab Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in injury_summary %}
+                            <tr>
+                                <td><strong>{{ row.sport }}</strong></td>
+                                <td>{{ row['Player Count'] }}</td>
+                                <td>{{ row['Total Injuries']|int }}</td>
+                                <td>{{ row['Avg Injuries'] }}</td>
+                                <td>
+                                    <span class="badge {% if row['Avg Risk'] > 0.5 %}badge-danger{% elif row['Avg Risk'] > 0.35 %}badge-warning{% else %}badge-success{% endif %}">
+                                        {{ (row['Avg Risk'] * 100)|round(1) }}%
+                                    </span>
+                                </td>
+                                <td>{{ (row['Risk Std'] * 100)|round(1) }}%</td>
+                                <td>{{ row['Total Days Missed']|int }}</td>
+                                <td>
+                                    <div class="progress" style="width: 100px; height: 8px;">
+                                        <div class="progress-bar" style="width: {{ row['Avg Rehab'] }}%; background: var(--gradient-primary);"></div>
+                                    </div>
+                                    <small>{{ row['Avg Rehab'] }}%</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Treatment Outcomes -->
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-bandaid text-success"></i>
+                    Treatment Outcomes Analysis
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Treatment Type</th>
+                                <th>Patients</th>
+                                <th>Avg Progress</th>
+                                <th>Avg Days Missed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in treatment_outcomes %}
+                            <tr>
+                                <td><strong>{{ row.treatment_type }}</strong></td>
+                                <td>{{ row['Patient Count'] }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                            <div class="progress-bar" style="width: {{ row['Avg Progress'] }}%; background: {% if row['Avg Progress'] > 70 %}linear-gradient(90deg, #10b981, #059669){% elif row['Avg Progress'] > 50 %}linear-gradient(90deg, #f59e0b, #d97706){% else %}linear-gradient(90deg, #ef4444, #dc2626){% endif %};"></div>
+                                        </div>
+                                        <span>{{ row['Avg Progress'] }}%</span>
+                                    </div>
+                                </td>
+                                <td>{{ row['Avg Days Missed'] }} days</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Age Group Analysis -->
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-calendar2-range text-info"></i>
+                    Age Group Analysis
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="ageGroupChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Country Analysis -->
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-globe text-purple"></i>
+                    Country Analysis (Top 15)
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-hover mb-0">
+                        <thead style="position: sticky; top: 0; background: var(--card-bg);">
+                            <tr>
+                                <th>Country</th>
+                                <th>Players</th>
+                                <th>Injuries</th>
+                                <th>Avg Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for country, data in country_analysis.items() %}
+                            <tr>
+                                <td><strong>{{ country }}</strong></td>
+                                <td>{{ data.players }}</td>
+                                <td>{{ data.injuries|int }}</td>
+                                <td>
+                                    <span class="badge {% if data.avg_risk > 0.5 %}badge-danger{% elif data.avg_risk > 0.35 %}badge-warning{% else %}badge-success{% endif %}">
+                                        {{ (data.avg_risk * 100)|round(1) }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Severity by Sport -->
+    <div class="col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-exclamation-octagon text-danger"></i>
+                    Injury Severity Distribution by Sport
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="severityChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Generation Actions -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="bi bi-file-earmark-arrow-down text-primary"></i>
+            Generate Reports
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="p-4 rounded text-center" style="background: var(--bg-tertiary); border: 1px solid var(--border-light);">
+                    <i class="bi bi-filetype-json display-4 text-primary mb-3" style="color: var(--primary);"></i>
+                    <h5 style="color: var(--text-primary);">JSON Export</h5>
+                    <p class="small" style="color: var(--text-secondary);">Export complete dataset in JSON format</p>
+                    <a href="{{ url_for('export_data', format_type='json') }}" class="btn btn-primary" target="_blank">
+                        <i class="bi bi-download me-1"></i>Download JSON
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 rounded text-center" style="background: var(--bg-tertiary); border: 1px solid var(--border-light);">
+                    <i class="bi bi-file-text display-4 mb-3" style="color: var(--success);"></i>
+                    <h5 style="color: var(--text-primary);">Summary Report</h5>
+                    <p class="small" style="color: var(--text-secondary);">Get summarized statistics and insights</p>
+                    <a href="{{ url_for('export_data', format_type='summary') }}" class="btn btn-success" target="_blank">
+                        <i class="bi bi-download me-1"></i>Download Summary
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 rounded text-center" style="background: var(--bg-tertiary); border: 1px solid var(--border-light);">
+                    <i class="bi bi-printer display-4 mb-3" style="color: var(--info);"></i>
+                    <h5 style="color: var(--text-primary);">Print Report</h5>
+                    <p class="small" style="color: var(--text-secondary);">Print current page as PDF report</p>
+                    <button class="btn btn-info" onclick="window.print()">
+                        <i class="bi bi-printer me-1"></i>Print Page
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Age Group Chart
+    const ageData = {{ age_analysis|tojson }};
+    const ageLabels = Object.keys(ageData);
+    
+    new Chart(document.getElementById('ageGroupChart'), {
+        type: 'bar',
+        data: {
+            labels: ageLabels,
+            datasets: [
+                {
+                    label: 'Avg Injuries',
+                    data: ageLabels.map(k => ageData[k].avg_injuries),
+                    backgroundColor: 'rgba(6, 182, 212, 0.8)',
+                    borderRadius: 6
+                },
+                {
+                    label: 'Avg Risk %',
+                    data: ageLabels.map(k => ageData[k].avg_risk * 100),
+                    backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                    borderRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: 'var(--text-muted)' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: 'var(--text-muted)' },
+                    grid: { color: 'var(--border-light)' }
+                },
+                x: {
+                    ticks: { color: 'var(--text-muted)' },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+    
+    // Severity Chart
+    const severityData = {{ severity_data|tojson }};
+    const sports = Object.keys(severityData);
+    const severities = ['Minor', 'Moderate', 'Severe', 'Critical'];
+    const colors = ['rgba(16, 185, 129, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(249, 115, 22, 0.8)', 'rgba(239, 68, 68, 0.8)'];
+    
+    new Chart(document.getElementById('severityChart'), {
+        type: 'bar',
+        data: {
+            labels: sports.slice(0, 6),
+            datasets: severities.map((sev, i) => ({
+                label: sev,
+                data: sports.slice(0, 6).map(s => severityData[s] ? (severityData[s][sev] || 0) : 0),
+                backgroundColor: colors[i],
+                borderRadius: 4
+            }))
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: 'var(--text-muted)' }
+                }
+            },
+            scales: {
+                x: { stacked: true, ticks: { color: 'var(--text-muted)' }, grid: { display: false } },
+                y: { stacked: true, ticks: { color: 'var(--text-muted)' }, grid: { color: 'var(--border-light)' } }
+            }
+        }
+    });
+});
+
+function exportTable(tableId) {
+    const table = document.getElementById(tableId);
+    let csv = [];
+    const rows = table.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        const cols = row.querySelectorAll('td, th');
+        const rowData = [];
+        cols.forEach(col => rowData.push(col.innerText.replace(/,/g, '')));
+        csv.push(rowData.join(','));
+    });
+    
+    const csvContent = csv.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = tableId + '.csv';
+    a.click();
+}
+</script>
+{% endblock %}

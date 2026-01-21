@@ -1,0 +1,1169 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness Products - Sportfy{% endblock %}
+
+{% block content %}
+<!-- Enhanced page header with gradient background and badges -->
+<div class="page-header-enhanced mb-4" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border-radius: 16px; padding: 2rem; border: 1px solid var(--border-color);">
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-cart-check" style="font-size: 1.75rem; color: white;"></i>
+        </div>
+        <div>
+            <h1 style="font-weight: 700; color: var(--text-primary); margin: 0; font-size: 1.75rem;">
+                Fitness Product Recommendations
+            </h1>
+            <p style="color: var(--text-secondary); margin: 0;">
+                Get the best fitness and recovery products at discounted prices from top retailers
+            </p>
+        </div>
+    </div>
+    <div class="d-flex gap-2 mt-3">
+        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 0.5rem 1rem;">
+            <i class="bi bi-shield-check me-1"></i>Verified Partners
+        </span>
+        <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 0.5rem 1rem;">
+            <i class="bi bi-percent me-1"></i>Up to 60% Off
+        </span>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-lg-6">
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="bi bi-shop"></i>
+            </div>
+            <div class="stat-info">
+                <h3>15+</h3>
+                <p>Partner Stores</p>
+                <div class="stat-trend up">
+                    <i class="bi bi-check-circle"></i> Verified
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+        <div class="stat-card">
+            <div class="stat-icon cyan">
+                <i class="bi bi-percent"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Up to 60%</h3>
+                <p>Discount Available</p>
+                <div class="stat-trend up">
+                    <i class="bi bi-arrow-up"></i> Best Deals
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <div class="stat-info">
+                <h3>500+</h3>
+                <p>Products Listed</p>
+                <div class="stat-trend up">
+                    <i class="bi bi-stars"></i> Quality
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+        <div class="stat-card">
+            <div class="stat-icon amber">
+                <i class="bi bi-truck"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Fast</h3>
+                <p>Delivery</p>
+                <div class="stat-trend up">
+                    <i class="bi bi-lightning"></i> Quick Ship
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Stores -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    Featured Stores - Best Deals on Fitness Products
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Amazon -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff9900 0%, #ffb84d 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-box-seam" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Amazon</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Wide range of fitness equipment, supplements, and recovery gear at competitive prices</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 50% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Gym Equipment</li>
+                                <li>Protein Supplements</li>
+                                <li>Resistance Bands</li>
+                                <li>Recovery Tools</li>
+                            </ul>
+                            <a href="https://www.amazon.in/sports-fitness/b?ie=UTF8&node=1984443031" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #ff9900 0%, #ffb84d 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Amazon
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Decathlon -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #0082c3 0%, #00a8e8 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-bicycle" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Decathlon</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Premium sports gear and fitness accessories at affordable prices</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 40% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Sports Apparel</li>
+                                <li>Training Shoes</li>
+                                <li>Yoga & Pilates</li>
+                                <li>Fitness Accessories</li>
+                            </ul>
+                            <a href="https://www.decathlon.in/sports/fitness" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #0082c3 0%, #00a8e8 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Decathlon
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Flipkart -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #2874f0 0%, #5a9cf0 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-cart4" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Flipkart</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Great deals on fitness products with easy returns and fast delivery</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 60% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Dumbbells & Weights</li>
+                                <li>Exercise Bikes</li>
+                                <li>Treadmills</li>
+                                <li>Fitness Trackers</li>
+                            </ul>
+                            <a href="https://www.flipkart.com/sports-fitness/pr?sid=abc" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #2874f0 0%, #5a9cf0 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Flipkart
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Myntra -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff3f6c 0%, #ff7094 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-bag-heart" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Myntra</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Stylish activewear and sports fashion from top brands</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 50% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Sports Wear</li>
+                                <li>Running Shoes</li>
+                                <li>Gym Clothing</li>
+                                <li>Sports Bags</li>
+                            </ul>
+                            <a href="https://www.myntra.com/sports" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #ff3f6c 0%, #ff7094 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Myntra
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Premium Sports Brands -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-award-fill text-primary"></i>
+                    Premium Sports Brands
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Nike -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #111111 0%, #333333 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-check2-circle" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Nike</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">World's leading sportswear brand with innovative technology</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 40% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Running Shoes</li>
+                                <li>Training Apparel</li>
+                                <li>Sports Bras</li>
+                                <li>Athletic Accessories</li>
+                            </ul>
+                            <a href="https://www.nike.com/in" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #111111 0%, #333333 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Nike
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Adidas -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-triangle-fill" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Adidas</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Premium athletic footwear and sportswear collection</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 50% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Ultraboost Shoes</li>
+                                <li>Track Pants</li>
+                                <li>Football Gear</li>
+                                <li>Gym Essentials</li>
+                            </ul>
+                            <a href="https://www.adidas.co.in" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Adidas
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Puma -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-lightning-charge-fill" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Puma</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Performance and style combined for athletes</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 55% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Running Shoes</li>
+                                <li>Sports T-Shirts</li>
+                                <li>Training Shorts</li>
+                                <li>Backpacks</li>
+                            </ul>
+                            <a href="https://in.puma.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Puma
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Under Armour -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1e3a5f 0%, #0f2439 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-shield-fill" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Under Armour</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Performance apparel engineered for athletes</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 45% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Compression Wear</li>
+                                <li>Training Shoes</li>
+                                <li>Moisture-Wicking Gear</li>
+                                <li>Sports Masks</li>
+                            </ul>
+                            <a href="https://www.underarmour.co.in" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f2439 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Under Armour
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Health & Supplement Stores -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-capsule-pill text-success"></i>
+                    Health & Supplement Stores
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- HealthKart -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-heart-pulse-fill" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">HealthKart</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">India's leading health supplement store</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 60% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Whey Protein</li>
+                                <li>Pre-Workout</li>
+                                <li>Vitamins & Minerals</li>
+                                <li>Weight Gainers</li>
+                            </ul>
+                            <a href="https://www.healthkart.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on HealthKart
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- MuscleBlaze -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-fire" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">MuscleBlaze</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Premium bodybuilding & fitness supplements</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 50% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Biozyme Protein</li>
+                                <li>Creatine</li>
+                                <li>BCAA</li>
+                                <li>Mass Gainers</li>
+                            </ul>
+                            <a href="https://www.muscleblaze.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on MuscleBlaze
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Cult.fit -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-person-arms-up" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Cult.fit</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Complete fitness ecosystem & healthy meals</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 40% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Gym Memberships</li>
+                                <li>Healthy Meals</li>
+                                <li>Fitness Gear</li>
+                                <li>Mental Wellness</li>
+                            </ul>
+                            <a href="https://www.cult.fit" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Cult.fit
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Nutrabay -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-capsule" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Nutrabay</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Authentic supplements with best prices</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 65% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Protein Powders</li>
+                                <li>Fat Burners</li>
+                                <li>Energy Drinks</li>
+                                <li>Health Foods</li>
+                            </ul>
+                            <a href="https://www.nutrabay.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Nutrabay
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sports Equipment Specialists -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-trophy-fill text-warning"></i>
+                    Sports Equipment Specialists
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Sports365 -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-calendar-check-fill" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Sports365</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Your daily sports equipment partner</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 45% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Cricket Equipment</li>
+                                <li>Football Gear</li>
+                                <li>Badminton Rackets</li>
+                                <li>Tennis Equipment</li>
+                            </ul>
+                            <a href="https://www.sports365.in" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Sports365
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Asics -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-speedometer2" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Asics</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Performance running shoes and athletic gear</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 40% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Gel Running Shoes</li>
+                                <li>Tennis Shoes</li>
+                                <li>Training Apparel</li>
+                                <li>Athletic Socks</li>
+                            </ul>
+                            <a href="https://www.asics.com/in" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Asics
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Reebok -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-arrow-left-right" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">Reebok</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">CrossFit and fitness training essentials</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 50% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>CrossFit Shoes</li>
+                                <li>Training Gear</li>
+                                <li>Compression Wear</li>
+                                <li>Workout Accessories</li>
+                            </ul>
+                            <a href="https://www.reebok.co.in" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on Reebok
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- New Balance -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="store-card h-100" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease;">
+                            <div class="text-center mb-3">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #64748b 0%, #475569 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="bi bi-n-square-fill" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+                            <h5 class="text-center" style="color: var(--text-primary);">New Balance</h5>
+                            <p class="text-center" style="color: var(--text-secondary); font-size: 0.9rem;">Premium comfort and performance footwear</p>
+                            <div class="text-center mb-3">
+                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem;">Up to 35% OFF</span>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 0.85rem; padding-left: 1.2rem;">
+                                <li>Fresh Foam Shoes</li>
+                                <li>FuelCell Sneakers</li>
+                                <li>Running Apparel</li>
+                                <li>Lifestyle Shoes</li>
+                            </ul>
+                            <a href="https://www.newbalance.co.in" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100 mt-3" style="background: linear-gradient(135deg, #64748b 0%, #475569 100%); border: none;">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Shop on New Balance
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Categories -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-grid-3x3-gap text-info"></i>
+                    Browse by Category
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Recovery Equipment -->
+                    <div class="col-md-4 col-lg-2">
+                        <a href="https://www.amazon.in/s?k=muscle+recovery+tools" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="category-card text-center p-3" style="background: var(--bg-tertiary); border-radius: 12px; transition: all 0.3s ease; cursor: pointer;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-bandaid" style="font-size: 1.25rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); font-size: 0.9rem; margin: 0;">Recovery Tools</h6>
+                                <small style="color: var(--text-muted);">Foam Rollers, Massage Guns</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Strength Training -->
+                    <div class="col-md-4 col-lg-2">
+                        <a href="https://www.decathlon.in/buy/dumbbells-kettlebells" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="category-card text-center p-3" style="background: var(--bg-tertiary); border-radius: 12px; transition: all 0.3s ease; cursor: pointer;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-lightning-charge" style="font-size: 1.25rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); font-size: 0.9rem; margin: 0;">Strength Training</h6>
+                                <small style="color: var(--text-muted);">Dumbbells, Kettlebells</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Cardio Equipment -->
+                    <div class="col-md-4 col-lg-2">
+                        <a href="https://www.flipkart.com/exercise-fitness-equipment/pr?sid=abc%2Cxyz" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="category-card text-center p-3" style="background: var(--bg-tertiary); border-radius: 12px; transition: all 0.3s ease; cursor: pointer;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-heart-pulse" style="font-size: 1.25rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); font-size: 0.9rem; margin: 0;">Cardio Equipment</h6>
+                                <small style="color: var(--text-muted);">Treadmills, Bikes</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Supplements -->
+                    <div class="col-md-4 col-lg-2">
+                        <a href="https://www.amazon.in/s?k=whey+protein" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="category-card text-center p-3" style="background: var(--bg-tertiary); border-radius: 12px; transition: all 0.3s ease; cursor: pointer;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-capsule" style="font-size: 1.25rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); font-size: 0.9rem; margin: 0;">Supplements</h6>
+                                <small style="color: var(--text-muted);">Protein, Vitamins</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Sports Wear -->
+                    <div class="col-md-4 col-lg-2">
+                        <a href="https://www.myntra.com/sports-wear" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="category-card text-center p-3" style="background: var(--bg-tertiary); border-radius: 12px; transition: all 0.3s ease; cursor: pointer;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-person-arms-up" style="font-size: 1.25rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); font-size: 0.9rem; margin: 0;">Sports Wear</h6>
+                                <small style="color: var(--text-muted);">Activewear, Shoes</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Accessories -->
+                    <div class="col-md-4 col-lg-2">
+                        <a href="https://www.decathlon.in/buy/fitness-accessories" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="category-card text-center p-3" style="background: var(--bg-tertiary); border-radius: 12px; transition: all 0.3s ease; cursor: pointer;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-smartwatch" style="font-size: 1.25rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); font-size: 0.9rem; margin: 0;">Accessories</h6>
+                                <small style="color: var(--text-muted);">Trackers, Bands</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recovery Products for Athletes -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-heart-pulse text-danger"></i>
+                    Recovery Products for Athletes
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="product-card p-3" style="background: var(--bg-tertiary); border-radius: 12px; border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-start gap-3">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-activity" style="font-size: 1.5rem; color: white;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 style="color: var(--text-primary); margin-bottom: 0.25rem;">Massage Guns</h6>
+                                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">Deep tissue percussion therapy for muscle recovery</p>
+                                    <a href="https://www.amazon.in/s?k=massage+gun" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                        View on Amazon <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="product-card p-3" style="background: var(--bg-tertiary); border-radius: 12px; border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-start gap-3">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-arrows-expand" style="font-size: 1.5rem; color: white;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 style="color: var(--text-primary); margin-bottom: 0.25rem;">Foam Rollers</h6>
+                                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">Self-myofascial release for flexibility & recovery</p>
+                                    <a href="https://www.decathlon.in/buy/foam-rollers" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                        View on Decathlon <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="product-card p-3" style="background: var(--bg-tertiary); border-radius: 12px; border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-start gap-3">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-snow" style="font-size: 1.5rem; color: white;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 style="color: var(--text-primary); margin-bottom: 0.25rem;">Ice Packs & Compression</h6>
+                                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">Cold therapy for injury recovery & pain relief</p>
+                                    <a href="https://www.flipkart.com/search?q=ice+pack+sports" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                        View on Flipkart <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="product-card p-3" style="background: var(--bg-tertiary); border-radius: 12px; border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-start gap-3">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-bandaid" style="font-size: 1.5rem; color: white;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 style="color: var(--text-primary); margin-bottom: 0.25rem;">Knee Braces & Supports</h6>
+                                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">Joint support and protection during activity</p>
+                                    <a href="https://www.amazon.in/s?k=knee+brace+sports" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                        View on Amazon <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="product-card p-3" style="background: var(--bg-tertiary); border-radius: 12px; border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-start gap-3">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-droplet" style="font-size: 1.5rem; color: white;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 style="color: var(--text-primary); margin-bottom: 0.25rem;">Sports Creams & Gels</h6>
+                                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">Pain relief creams and muscle rubs</p>
+                                    <a href="https://www.flipkart.com/search?q=pain+relief+cream+sports" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                        View on Flipkart <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="product-card p-3" style="background: var(--bg-tertiary); border-radius: 12px; border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-start gap-3">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-lightning" style="font-size: 1.5rem; color: white;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 style="color: var(--text-primary); margin-bottom: 0.25rem;">Resistance Bands</h6>
+                                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">Rehabilitation & strength training bands</p>
+                                    <a href="https://www.decathlon.in/buy/resistance-bands" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                        View on Decathlon <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tips Section -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-lightbulb" style="color: #f59e0b; font-size: 1.2rem;"></i>
+                    Shopping Tips for Athletes
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.25s;">
+                            <h6 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.5rem;">
+                                <i class="bi bi-check-circle" style="color: #10b981; font-size: 1.1rem;"></i>
+                                Compare Prices
+                            </h6>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0; line-height: 1.5;">
+                                Check multiple stores before buying. Prices can vary significantly across platforms.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.25s;">
+                            <h6 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.5rem;">
+                                <i class="bi bi-star" style="color: #f59e0b; font-size: 1.1rem;"></i>
+                                Read Reviews
+                            </h6>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0; line-height: 1.5;">
+                                Always check product reviews from verified buyers before making a purchase.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.25s;">
+                            <h6 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.5rem;">
+                                <i class="bi bi-calendar-event" style="color: #06b6d4; font-size: 1.1rem;"></i>
+                                Wait for Sales
+                            </h6>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0; line-height: 1.5;">
+                                Major sales like Big Billion Days, Amazon Sale, etc. offer significant discounts.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fitness Training Programs -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-play-circle" style="color: #7c3aed; font-size: 1.2rem;"></i>
+                    Fitness Training Programs & Apps
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-4">
+                        <a href="https://www.youtube.com/results?search_query=workout+training+programs" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-play-fill" style="font-size: 1.5rem; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">YouTube Fitness</h6>
+                                        <small style="color: var(--text-secondary);">Free workout videos & tutorials</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <a href="https://www.fittr.in" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-graph-up" style="font-size: 1.5rem; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Fittr App</h6>
+                                        <small style="color: var(--text-secondary);">Personalized fitness tracking</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <a href="https://www.fittr.in" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-heart-pulse" style="font-size: 1.5rem; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Workout Plans</h6>
+                                        <small style="color: var(--text-secondary);">Custom training routines</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nutrition & Diet Resources -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-apple" style="color: #059669; font-size: 1.2rem;"></i>
+                    Nutrition & Diet Guide
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
+                        <a href="https://www.healthline.com/nutrition" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer; text-align: center;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-egg-fried" style="font-size: 1.3rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Nutrition Tips</h6>
+                                <small style="color: var(--text-secondary);">Expert diet advice</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <a href="https://www.myfitnesspal.com" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer; text-align: center;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-calculator" style="font-size: 1.3rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Calorie Counter</h6>
+                                <small style="color: var(--text-secondary);">Track macro nutrients</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <a href="https://www.healthline.com/nutrition/meal-plans" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer; text-align: center;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-cup-straw" style="font-size: 1.3rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Meal Plans</h6>
+                                <small style="color: var(--text-secondary);">Pre-planned diets</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <a href="https://www.amazon.in/s?k=protein+supplement" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer; text-align: center;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-cup" style="font-size: 1.3rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Supplements</h6>
+                                <small style="color: var(--text-secondary);">Buy supplements</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fitness Resources & Blogs -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-book" style="color: #06b6d4; font-size: 1.2rem;"></i>
+                    Popular Fitness Blogs & Websites
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-4">
+                        <a href="https://www.bodybuilding.com" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer;">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-person-fill" style="font-size: 1.5rem; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Bodybuilding.com</h6>
+                                        <small style="color: var(--text-secondary);">Strength training & nutrition</small>
+                                        <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0.5rem 0 0 0;">Expert advice on weight training, muscle building & diet plans</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <a href="https://www.runnersworld.com" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer;">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-arrow-repeat" style="font-size: 1.5rem; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Runner's World</h6>
+                                        <small style="color: var(--text-secondary);">Running & cardio fitness</small>
+                                        <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0.5rem 0 0 0;">Running training, race tips & marathon preparation</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <a href="https://www.healthline.com" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer;">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-heart-pulse" style="font-size: 1.5rem; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Healthline</h6>
+                                        <small style="color: var(--text-secondary);">Health & fitness info</small>
+                                        <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0.5rem 0 0 0;">Comprehensive health, wellness & fitness guides</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <a href="https://www.livestrong.com" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer;">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-lightning" style="font-size: 1.5rem; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">LIVESTRONG</h6>
+                                        <small style="color: var(--text-secondary);">Fitness & wellness</small>
+                                        <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0.5rem 0 0 0;">Workout routines, nutrition tips & fitness articles</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <a href="https://www.acefitness.org/fit" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer;">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-award" style="font-size: 1.5rem; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">ACE Fitness</h6>
+                                        <small style="color: var(--text-secondary);">Professional fitness</small>
+                                        <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0.5rem 0 0 0;">Certified trainer resources & professional fitness info</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <a href="https://www.minimalistbaker.com" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer;">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-suit-spade" style="font-size: 1.5rem; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Minimalist Baker</h6>
+                                        <small style="color: var(--text-secondary);">Healthy recipes</small>
+                                        <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0.5rem 0 0 0;">Simple healthy recipes for fitness & nutrition goals</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Tracking Tools -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-graph-up" style="color: #d97706; font-size: 1.2rem;"></i>
+                    Performance Tracking & Wearables
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
+                        <a href="https://www.amazon.in/s?k=fitness+tracker" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer; text-align: center;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-smartwatch" style="font-size: 1.3rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Fitness Trackers</h6>
+                                <small style="color: var(--text-secondary);">Track daily activity</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <a href="https://www.garmin.com" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer; text-align: center;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-watch" style="font-size: 1.3rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Garmin Sports</h6>
+                                <small style="color: var(--text-secondary);">Advanced tracking</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <a href="https://www.fitbit.com" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer; text-align: center;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-heart" style="font-size: 1.3rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Fitbit</h6>
+                                <small style="color: var(--text-secondary);">Health monitoring</small>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <a href="https://www.apple.com/watch/fitness/" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <div class="p-4 rounded" style="background: var(--bg-tertiary); border: 1.5px solid var(--border-color); transition: all 0.35s; cursor: pointer; text-align: center;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                                    <i class="bi bi-broadcast" style="font-size: 1.3rem; color: white;"></i>
+                                </div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.25rem 0; font-weight: 700;">Apple Watch</h6>
+                                <small style="color: var(--text-secondary);">Premium tracking</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .store-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+        border-color: var(--accent-primary) !important;
+    }
+    
+    .category-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        background: var(--bg-secondary) !important;
+        border-color: var(--accent-primary) !important;
+    }
+    
+    .product-card:hover {
+        border-color: var(--accent-primary) !important;
+        transform: translateY(-2px);
+    }
+
+    /* Enhanced resource cards hover */
+    .resource-link:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    /* Training program cards */
+    a .p-4:has(+ .d-flex):hover {
+        border-color: var(--accent-primary) !important;
+    }
+</style>
+
+{% endblock %}

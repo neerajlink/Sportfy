@@ -1,0 +1,948 @@
+{% extends 'base.html' %}
+
+{% block title %}Video Analysis & Injury Prediction - Sportfy{% endblock %}
+
+{% block content %}
+<style>
+    /* Video upload and preview styles */
+    .video-upload-area {
+        background: var(--bg-tertiary);
+        border: 2px dashed var(--border-color);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    
+    .video-upload-area:hover {
+        border-color: var(--accent-primary);
+        background: var(--bg-secondary);
+    }
+    
+    .video-upload-area i {
+        font-size: 3rem;
+        color: var(--accent-primary);
+        margin-bottom: 1rem;
+    }
+    
+    .video-preview {
+        width: 100%;
+        max-height: 300px;
+        border-radius: 8px;
+        background: #000;
+        display: none;
+        margin-bottom: 1rem;
+    }
+    
+    .analysis-progress {
+        height: 8px;
+        background: var(--bg-tertiary);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+    
+    .analysis-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent-primary), var(--accent-success));
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+    
+    /* Analysis results styling */
+    .injury-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .injury-card.critical {
+        border-left: 4px solid var(--accent-danger);
+    }
+    
+    .injury-card.warning {
+        border-left: 4px solid var(--accent-warning);
+    }
+    
+    .injury-card.info {
+        border-left: 4px solid var(--accent-info);
+    }
+    
+    .solution-item {
+        background: var(--bg-tertiary);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .metric-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .exercise-demo {
+        position: relative;
+        height: 200px;
+        background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+    
+    .exercise-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-muted);
+    }
+    
+    /* Upload history */
+    .history-item {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .history-item:hover {
+        transform: translateX(5px);
+        border-color: var(--accent-primary);
+    }
+    
+    .video-thumbnail {
+        width: 80px;
+        height: 60px;
+        background: #000;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+</style>
+
+<!-- Enhanced page header with gradient background -->
+<div class="page-header-enhanced mb-4" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border-radius: 16px; padding: 2rem; border: 1px solid var(--border-color);">
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent-primary) 0%, #06b6d4 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-camera-video" style="font-size: 1.75rem; color: white;"></i>
+        </div>
+        <div>
+            <h1 style="font-weight: 700; color: var(--text-primary); margin: 0; font-size: 1.75rem;">
+                Video Analysis & Injury Prediction
+            </h1>
+            <p style="color: var(--text-secondary); margin: 0;">
+                Upload training videos for AI-powered biomechanical analysis, injury detection, and personalized solutions
+            </p>
+        </div>
+    </div>
+    <div class="d-flex gap-2 mt-3">
+        <span class="badge" style="background: rgba(var(--accent-success-rgb), 0.15); color: var(--accent-success); padding: 0.5rem 1rem;">
+            <i class="bi bi-cpu me-1"></i>AI-Powered Analysis
+        </span>
+        <span class="badge" style="background: rgba(var(--accent-info-rgb), 0.15); color: var(--accent-info); padding: 0.5rem 1rem;">
+            <i class="bi bi-lightning me-1"></i>Real-time Results
+        </span>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon cyan">
+                <i class="bi bi-upload"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="totalUploads">0</h3>
+                <p>Videos Analyzed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="issuesDetected">0</h3>
+                <p>Issues Detected</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon amber">
+                <i class="bi bi-lightbulb"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="solutionsGenerated">0</h3>
+                <p>Solutions Generated</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="bi bi-cpu-fill"></i>
+            </div>
+            <div class="stat-info">
+                <h3>AI-Powered</h3>
+                <p>Analysis Engine</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Analysis Area -->
+<div class="row g-4">
+    <!-- Left Column: Video Upload & Analysis -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-upload me-2 text-primary"></i>
+                    Upload Training Video
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Video Upload Area -->
+                <div class="video-upload-area" id="uploadArea">
+                    <i class="bi bi-cloud-upload"></i>
+                    <h5 style="color: var(--text-primary);">Drop your training video here</h5>
+                    <p style="color: var(--text-secondary);">or click to browse (MP4, MOV, AVI up to 100MB)</p>
+                    <input type="file" id="videoInput" accept="video/*" style="display: none;">
+                </div>
+                
+                <!-- Video Preview -->
+                <video id="videoPreview" class="video-preview" controls></video>
+                
+                <!-- Analysis Controls -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label style="color: var(--text-primary); margin-bottom: 0.5rem; display: block;">
+                                <i class="bi bi-person me-1"></i> Select Athlete
+                            </label>
+                            <select class="form-select" id="playerSelect" style="background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-color);">
+                                <option value="">Select player...</option>
+                                {% for session in analysis_sessions %}
+                                <option value="{{ session.player_id }}">{{ session.player_name }} ({{ session.sport }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label style="color: var(--text-primary); margin-bottom: 0.5rem; display: block;">
+                                <i class="bi bi-activity me-1"></i> Activity Type
+                            </label>
+                            <select class="form-select" id="activityType" style="background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-color);">
+                                <option value="running">Running/Jogging</option>
+                                <option value="jumping">Jumping/Landing</option>
+                                <option value="cutting">Cutting/Pivoting</option>
+                                <option value="lifting">Weight Lifting</option>
+                                <option value="throwing">Throwing/Serving</option>
+                                <option value="swimming">Swimming Stroke</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label style="color: var(--text-primary); margin-bottom: 0.5rem; display: block;">
+                        <i class="bi bi-chat-text me-1"></i> Additional Notes
+                    </label>
+                    <textarea class="form-control" id="videoNotes" rows="2" 
+                              placeholder="Describe any pain, discomfort, or specific concerns..." 
+                              style="background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-color);"></textarea>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="analysis-progress">
+                    <div class="analysis-progress-bar" id="analysisProgress"></div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="analyzeBtn" disabled onclick="analyzeVideo()">
+                        <i class="bi bi-play-circle me-1"></i>
+                        Start Analysis
+                    </button>
+                    <button class="btn btn-outline-secondary" id="clearBtn" onclick="clearAnalysis()">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analysis Results -->
+        <div class="card mt-4" id="resultsCard" style="display: none;">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-clipboard-data me-2 text-success"></i>
+                    Analysis Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="resultsContent">
+                    <!-- Results will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column: Recent Analysis & Tips -->
+    <div class="col-lg-4">
+        <!-- Recent Analysis History -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Recent Analyses
+                </h6>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                <div id="analysisHistory">
+                    <!-- History will be loaded here -->
+                    <div class="text-center py-4" style="color: var(--text-muted);">
+                        <i class="bi bi-clock-history" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>No analysis history yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Tips -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-lightbulb me-2 text-warning"></i>
+                    Video Recording Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="solution-item">
+                    <strong style="color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                        <i class="bi bi-record-circle me-1"></i> Recording Setup
+                    </strong>
+                    <ul style="color: var(--text-secondary); font-size: 0.9rem; padding-left: 1.2rem; margin: 0;">
+                        <li>Use tripod or stable surface</li>
+                        <li>Record at 60 FPS if possible</li>
+                        <li>Multiple angles recommended</li>
+                    </ul>
+                </div>
+                <div class="solution-item">
+                    <strong style="color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                        <i class="bi bi-brightness-high me-1"></i> Lighting & Background
+                    </strong>
+                    <ul style="color: var(--text-secondary); font-size: 0.9rem; padding-left: 1.2rem; margin: 0;">
+                        <li>Good lighting from the front</li>
+                        <li>Plain background preferred</li>
+                        <li>Avoid shadows on body</li>
+                    </ul>
+                </div>
+                <div class="solution-item">
+                    <strong style="color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                        <i class="bi bi-arrow-repeat me-1"></i> Movement Capture
+                    </strong>
+                    <ul style="color: var(--text-secondary); font-size: 0.9rem; padding-left: 1.2rem; margin: 0;">
+                        <li>Record 5-10 repetitions</li>
+                        <li>Include full movement cycle</li>
+                        <li>Wear form-fitting clothing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Exercise Demonstration Modal -->
+<div class="modal fade" id="exerciseModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: var(--bg-secondary);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                <h5 class="modal-title" id="exerciseModalTitle">Exercise Demonstration</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="exerciseModalContent">
+                <!-- Exercise content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Global variables
+    let currentVideoFile = null;
+    let analysisHistory = JSON.parse(localStorage.getItem('videoAnalysisHistory')) || [];
+    
+    // Update stats
+    function updateStats() {
+        document.getElementById('totalUploads').textContent = analysisHistory.length;
+        const totalIssues = analysisHistory.reduce((sum, item) => sum + (item.issuesDetected || 0), 0);
+        const totalSolutions = analysisHistory.reduce((sum, item) => sum + (item.solutionsProvided || 0), 0);
+        document.getElementById('issuesDetected').textContent = totalIssues;
+        document.getElementById('solutionsGenerated').textContent = totalSolutions;
+    }
+    
+    // Load analysis history
+    function loadAnalysisHistory() {
+        const historyContainer = document.getElementById('analysisHistory');
+        if (analysisHistory.length === 0) {
+            historyContainer.innerHTML = `
+                <div class="text-center py-4" style="color: var(--text-muted);">
+                    <i class="bi bi-clock-history" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p>No analysis history yet</p>
+                </div>
+            `;
+            return;
+        }
+        
+        historyContainer.innerHTML = analysisHistory.slice(0, 5).map((item, index) => `
+            <div class="history-item" onclick="loadAnalysisResult(${analysisHistory.length - 1 - index})">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="video-thumbnail">
+                        <i class="bi bi-play-circle-fill"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <strong style="color: var(--text-primary); font-size: 0.9rem; display: block;">
+                            ${item.playerName || 'Unknown Athlete'}
+                        </strong>
+                        <small style="color: var(--text-muted);">${item.activityType} • ${item.timestamp}</small>
+                        <div class="mt-1">
+                            <span class="badge ${item.riskLevel === 'high' ? 'badge-danger' : item.riskLevel === 'medium' ? 'badge-warning' : 'badge-success'}">
+                                ${item.riskLevel || 'low'} risk
+                            </span>
+                            <span class="badge badge-info ms-1">
+                                ${item.issuesDetected || 0} issues
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Video upload handling
+    document.getElementById('uploadArea').addEventListener('click', () => {
+        document.getElementById('videoInput').click();
+    });
+    
+    document.getElementById('videoInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('video/')) {
+            currentVideoFile = file;
+            const videoPreview = document.getElementById('videoPreview');
+            videoPreview.src = URL.createObjectURL(file);
+            videoPreview.style.display = 'block';
+            document.getElementById('analyzeBtn').disabled = false;
+            
+            // Update upload area text
+            document.getElementById('uploadArea').innerHTML = `
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <h5 style="color: var(--text-primary);">Video Selected</h5>
+                <p style="color: var(--text-secondary);">${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)</p>
+                <small style="color: var(--text-muted);">Click to change video</small>
+            `;
+        }
+    });
+    
+    // Drag and drop support
+    document.getElementById('uploadArea').addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.currentTarget.style.borderColor = 'var(--accent-primary)';
+        e.currentTarget.style.background = 'var(--bg-secondary)';
+    });
+    
+    document.getElementById('uploadArea').addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        e.currentTarget.style.borderColor = 'var(--border-color)';
+        e.currentTarget.style.background = 'var(--bg-tertiary)';
+    });
+    
+    document.getElementById('uploadArea').addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.currentTarget.style.borderColor = 'var(--border-color)';
+        e.currentTarget.style.background = 'var(--bg-tertiary)';
+        
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('video/')) {
+            currentVideoFile = file;
+            const videoPreview = document.getElementById('videoPreview');
+            videoPreview.src = URL.createObjectURL(file);
+            videoPreview.style.display = 'block';
+            document.getElementById('analyzeBtn').disabled = false;
+            
+            document.getElementById('uploadArea').innerHTML = `
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <h5 style="color: var(--text-primary);">Video Dropped</h5>
+                <p style="color: var(--text-secondary);">${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)</p>
+                <small style="color: var(--text-muted);">Click to change video</small>
+            `;
+        }
+    });
+    
+    // Video analysis function
+    async function analyzeVideo() {
+        if (!currentVideoFile) return;
+        
+        const playerId = document.getElementById('playerSelect').value;
+        const playerSelect = document.getElementById('playerSelect');
+        const playerName = playerSelect.options[playerSelect.selectedIndex]?.text || 'Unknown Athlete';
+        const activityType = document.getElementById('activityType').value;
+        const notes = document.getElementById('videoNotes').value;
+        
+        // Show progress
+        const progressBar = document.getElementById('analysisProgress');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resultsCard = document.getElementById('resultsCard');
+        
+        analyzeBtn.disabled = true;
+        analyzeBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Analyzing...';
+        
+        // Simulate progress
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            progress = Math.min(progress, 95);
+            progressBar.style.width = progress + '%';
+        }, 200);
+        
+        try {
+            // In a real app, this would upload to server for analysis
+            // For demo, we'll simulate analysis with a timeout
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            
+            // Get analysis results based on activity type
+            const analysisResult = getAnalysisResult(activityType, playerName, notes);
+            
+            // Save to history
+            const historyItem = {
+                playerId,
+                playerName,
+                activityType,
+                notes,
+                timestamp: new Date().toLocaleString(),
+                issuesDetected: analysisResult.issues.length,
+                solutionsProvided: analysisResult.solutions.length,
+                riskLevel: analysisResult.riskLevel,
+                result: analysisResult
+            };
+            
+            analysisHistory.push(historyItem);
+            localStorage.setItem('videoAnalysisHistory', JSON.stringify(analysisHistory));
+            
+            // Display results
+            displayAnalysisResults(analysisResult);
+            resultsCard.style.display = 'block';
+            
+            // Update history and stats
+            loadAnalysisHistory();
+            updateStats();
+            
+            // Reset button
+            setTimeout(() => {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="bi bi-play-circle me-1"></i> Start Analysis';
+                progressBar.style.width = '0%';
+            }, 1000);
+            
+            // Scroll to results
+            resultsCard.scrollIntoView({ behavior: 'smooth' });
+            
+        } catch (error) {
+            clearInterval(progressInterval);
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = '<i class="bi bi-play-circle me-1"></i> Start Analysis';
+            alert('Analysis failed: ' + error.message);
+        }
+    }
+    
+    // Get analysis results (simulated AI analysis)
+    function getAnalysisResult(activityType, playerName, notes) {
+        // Base analysis based on activity type
+        const analysisTemplates = {
+            running: {
+                title: "Running Gait Analysis",
+                riskLevel: "medium",
+                biomechMetrics: {
+                    strideLength: { value: "1.42m", status: "short", ideal: "1.5-1.8m" },
+                    cadence: { value: "165 steps/min", status: "good", ideal: "160-180 steps/min" },
+                    groundContact: { value: "240ms", status: "high", ideal: "200-220ms" },
+                    verticalOscillation: { value: "8.2cm", status: "high", ideal: "6-8cm" }
+                },
+                issues: [
+                    { type: "Overstriding", severity: "medium", confidence: "85%", 
+                      description: "Foot lands too far in front of body, increasing braking forces" },
+                    { type: "Hip Drop", severity: "high", confidence: "78%", 
+                      description: "Excessive lateral pelvis drop during stance phase" },
+                    { type: "Reduced Knee Flexion", severity: "low", confidence: "65%", 
+                      description: "Limited knee bend during swing phase" }
+                ],
+                solutions: [
+                    { title: "Cadence Drills", description: "Increase step rate to 170-175 steps/min using metronome", 
+                      duration: "10min daily", equipment: "Metronome app", benefit: "Reduce overstriding by 30%" },
+                    { title: "Single-Leg Balance", description: "Stand on one leg with slight knee bend, maintain for 45 seconds", 
+                      duration: "3x each side", equipment: "None", benefit: "Improve hip stability" },
+                    { title: "Wall Drills", description: "Lean against wall at 45°, practice high knee raises", 
+                      duration: "2x10 each leg", equipment: "Wall", benefit: "Increase knee flexion range" }
+                ]
+            },
+            jumping: {
+                title: "Jump/Landing Analysis",
+                riskLevel: "high",
+                biomechMetrics: {
+                    landingForce: { value: "4.2x BW", status: "high", ideal: "2.5-3.5x BW" },
+                    kneeValgus: { value: "12°", status: "high", ideal: "< 8°" },
+                    contactTime: { value: "0.18s", status: "good", ideal: "0.15-0.20s" },
+                    symmetry: { value: "78%", status: "poor", ideal: "> 90%" }
+                },
+                issues: [
+                    { type: "Knee Valgus", severity: "high", confidence: "92%", 
+                      description: "Knees collapse inward during landing, high ACL injury risk" },
+                    { type: "Stiff Landing", severity: "medium", confidence: "81%", 
+                      description: "Limited ankle/knee/hip flexion upon impact" },
+                    { type: "Asymmetry", severity: "medium", confidence: "76%", 
+                      description: "Right leg absorbs 22% more force than left" }
+                ],
+                solutions: [
+                    { title: "Plyometric Landing Drills", description: "Practice soft landings with emphasis on knee alignment", 
+                      duration: "3x8 jumps", equipment: "Box (30cm)", benefit: "Reduce landing force by 25%" },
+                    { title: "Hip Abduction Strength", description: "Resistance band lateral walks and monster walks", 
+                      duration: "3x15 each direction", equipment: "Resistance band", benefit: "Improve knee stability" },
+                    { title: "Single-Leg Hops", description: "Controlled hops focusing on stable landing position", 
+                      duration: "3x10 each leg", equipment: "Tape line", benefit: "Improve symmetry to >85%" }
+                ]
+            },
+            cutting: {
+                title: "Cutting/Pivoting Analysis",
+                riskLevel: "medium",
+                biomechMetrics: {
+                    cutAngle: { value: "45°", status: "moderate", ideal: "40-50°" },
+                    decelerationForce: { value: "3.8x BW", status: "high", ideal: "2.5-3.5x BW" },
+                    plantFootAngle: { value: "15°", status: "good", ideal: "10-20°" },
+                    bodyLean: { value: "22°", status: "optimal", ideal: "20-25°" }
+                },
+                issues: [
+                    { type: "Excessive Deceleration", severity: "medium", confidence: "79%", 
+                      description: "Sudden stop before direction change increases joint loading" },
+                    { type: "Poor Weight Transfer", severity: "low", confidence: "68%", 
+                      description: "Weight remains on back foot too long during cut" },
+                    { type: "Arm Position", severity: "low", confidence: "62%", 
+                      description: "Arms not used efficiently for balance" }
+                ],
+                solutions: [
+                    { title: "Progressive Cutting Drills", description: "Start with wide angles, gradually increase sharpness", 
+                      duration: "15min session", equipment: "Cones", benefit: "Improve cutting efficiency" },
+                    { title: "Deceleration Training", description: "Controlled stops from moderate speed", 
+                      duration: "3x5 each side", equipment: "None", benefit: "Reduce joint loading" },
+                    { title: "Reaction Drills", description: "Respond to visual cues for direction changes", 
+                      duration: "10min", equipment: "Partner/coach", benefit: "Improve decision making" }
+                ]
+            }
+        };
+        
+        const baseAnalysis = analysisTemplates[activityType] || analysisTemplates.running;
+        
+        // Customize based on notes
+        let customizedAnalysis = JSON.parse(JSON.stringify(baseAnalysis));
+        
+        if (notes.toLowerCase().includes('knee') || notes.toLowerCase().includes('pain')) {
+            customizedAnalysis.riskLevel = "high";
+            customizedAnalysis.issues.push({
+                type: "Potential Knee Overload",
+                severity: "high",
+                confidence: "88%",
+                description: "Movement pattern indicates excessive stress on knee joints"
+            });
+            customizedAnalysis.solutions.push({
+                title: "Knee-Friendly Modifications",
+                description: "Reduce impact activities by 30%, focus on low-impact alternatives",
+                duration: "2 weeks",
+                equipment: "Stationary bike",
+                benefit: "Reduce knee pain by 40-60%"
+            });
+        }
+        
+        if (notes.toLowerCase().includes('ankle') || notes.toLowerCase().includes('sprain')) {
+            customizedAnalysis.issues.push({
+                type: "Ankle Stability Concern",
+                severity: "medium",
+                confidence: "74%",
+                description: "Lateral movement control needs improvement"
+            });
+            customizedAnalysis.solutions.push({
+                title: "Ankle Proprioception",
+                description: "Balance exercises on unstable surfaces",
+                duration: "5min daily",
+                equipment: "Balance board",
+                benefit: "Improve ankle stability by 35%"
+            });
+        }
+        
+        return customizedAnalysis;
+    }
+    
+    // Display analysis results
+    function displayAnalysisResults(result) {
+        const resultsContent = document.getElementById('resultsContent');
+        
+        let issuesHTML = result.issues.map(issue => `
+            <div class="injury-card ${issue.severity === 'high' ? 'critical' : issue.severity === 'medium' ? 'warning' : 'info'}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h6 style="color: var(--text-primary); margin: 0;">
+                            <i class="bi bi-exclamation-triangle ${issue.severity === 'high' ? 'text-danger' : issue.severity === 'medium' ? 'text-warning' : 'text-info'} me-2"></i>
+                            ${issue.type}
+                        </h6>
+                        <small style="color: var(--text-muted);">${issue.confidence} confidence • ${issue.severity} severity</small>
+                    </div>
+                    <span class="badge ${issue.severity === 'high' ? 'badge-danger' : issue.severity === 'medium' ? 'badge-warning' : 'badge-info'}">
+                        ${issue.severity}
+                    </span>
+                </div>
+                <p style="color: var(--text-secondary); margin: 0.5rem 0; font-size: 0.9rem;">
+                    ${issue.description}
+                </p>
+            </div>
+        `).join('');
+        
+        let metricsHTML = Object.entries(result.biomechMetrics).map(([key, data]) => `
+            <div class="metric-badge">
+                <strong style="color: var(--text-primary); display: block; font-size: 0.8rem;">${key.replace(/([A-Z])/g, ' $1').trim()}:</strong>
+                <span style="color: ${data.status === 'good' || data.status === 'optimal' ? 'var(--accent-success)' : data.status === 'high' ? 'var(--accent-danger)' : 'var(--accent-warning)'};">
+                    ${data.value}
+                </span>
+                <small style="color: var(--text-muted); display: block; font-size: 0.7rem;">Ideal: ${data.ideal}</small>
+            </div>
+        `).join('');
+        
+        let solutionsHTML = result.solutions.map((solution, index) => `
+            <div class="solution-item">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div style="flex: 1;">
+                        <h6 style="color: var(--text-primary); margin: 0;">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            ${solution.title}
+                        </h6>
+                        <small style="color: var(--text-muted);">${solution.duration} • ${solution.equipment}</small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" onclick="showExerciseDemo(${index})">
+                        <i class="bi bi-play-circle"></i>
+                    </button>
+                </div>
+                <p style="color: var(--text-secondary); margin: 0.5rem 0; font-size: 0.9rem;">
+                    ${solution.description}
+                </p>
+                <div style="background: var(--bg-secondary); padding: 0.5rem; border-radius: 4px;">
+                    <small style="color: var(--accent-success);">
+                        <i class="bi bi-graph-up me-1"></i>
+                        Expected benefit: ${solution.benefit}
+                    </small>
+                </div>
+            </div>
+        `).join('');
+        
+        resultsContent.innerHTML = `
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 style="color: var(--text-primary); margin: 0;">${result.title}</h4>
+                    <span class="badge ${result.riskLevel === 'high' ? 'badge-danger' : result.riskLevel === 'medium' ? 'badge-warning' : 'badge-success'}">
+                        ${result.riskLevel.toUpperCase()} INJURY RISK
+                    </span>
+                </div>
+                <p style="color: var(--text-secondary);">
+                    Analysis completed at ${new Date().toLocaleTimeString()} based on uploaded video.
+                </p>
+            </div>
+            
+            <div class="mb-4">
+                <h6 style="color: var(--text-primary); margin-bottom: 1rem;">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    Biomechanical Metrics
+                </h6>
+                <div>
+                    ${metricsHTML}
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <h6 style="color: var(--text-primary); margin-bottom: 1rem;">
+                    <i class="bi bi-exclamation-octagon me-2"></i>
+                    Detected Issues (${result.issues.length})
+                </h6>
+                ${issuesHTML}
+            </div>
+            
+            <div>
+                <h6 style="color: var(--text-primary); margin-bottom: 1rem;">
+                    <i class="bi bi-lightbulb me-2"></i>
+                    Recommended Solutions (${result.solutions.length})
+                </h6>
+                ${solutionsHTML}
+            </div>
+            
+            <div class="mt-4 pt-3 border-top" style="border-color: var(--border-color);">
+                <div class="alert alert-info" style="background: var(--bg-tertiary); border-color: var(--accent-info);">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Next Steps:</strong> Implement these solutions and re-analyze in 2-4 weeks to track progress.
+                    Consult with a sports medicine professional for personalized guidance.
+                </div>
+            </div>
+        `;
+    }
+    
+    // Show exercise demonstration
+    function showExerciseDemo(index) {
+        const exerciseExamples = [
+            {
+                title: "Cadence Drills with Metronome",
+                description: "Running in place or light jogging while matching step rate to metronome beat",
+                keyPoints: [
+                    "Start with comfortable pace (160-165 steps/min)",
+                    "Gradually increase by 5 steps/min weekly",
+                    "Focus on light, quick steps",
+                    "Maintain upright posture"
+                ],
+                sets: "3 sets of 1 minute",
+                rest: "30 seconds between sets"
+            },
+            {
+                title: "Single-Leg Balance Progression",
+                description: "Balance training to improve hip and ankle stability",
+                keyPoints: [
+                    "Stand on one leg with slight knee bend",
+                    "Keep pelvis level - don't let hip drop",
+                    "Progress by closing eyes or adding head turns",
+                    "Use wall for support if needed"
+                ],
+                sets: "3 sets of 45 seconds per leg",
+                rest: "15 seconds between sets"
+            },
+            {
+                title: "Plyometric Landing Technique",
+                description: "Learning to land softly with proper alignment",
+                keyPoints: [
+                    "Land on balls of feet first, then heels",
+                    "Bend ankles, knees, and hips upon landing",
+                    "Keep knees aligned with toes",
+                    "Land as quietly as possible"
+                ],
+                sets: "3 sets of 8 landings",
+                rest: "60 seconds between sets"
+            }
+        ];
+        
+        const exercise = exerciseExamples[index] || exerciseExamples[0];
+        const modal = new bootstrap.Modal(document.getElementById('exerciseModal'));
+        
+        document.getElementById('exerciseModalTitle').textContent = exercise.title;
+        document.getElementById('exerciseModalContent').innerHTML = `
+            <div class="row g-4">
+                <div class="col-md-7">
+                    <div class="exercise-demo">
+                        <div class="exercise-placeholder">
+                            <i class="bi bi-play-circle-fill" style="font-size: 3rem;"></i>
+                            <p style="margin-top: 1rem;">Exercise Demonstration Video</p>
+                            <small style="color: var(--text-muted);">(Video integration would show here)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div style="margin-bottom: 1.5rem;">
+                        <h6 style="color: var(--text-primary); margin-bottom: 0.5rem;">
+                            <i class="bi bi-card-checklist me-1"></i>
+                            Key Points
+                        </h6>
+                        <ul style="color: var(--text-secondary); padding-left: 1.2rem; margin: 0;">
+                            ${exercise.keyPoints.map(point => `<li>${point}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div style="background: var(--bg-tertiary); border-radius: 8px; padding: 1rem;">
+                        <div style="color: var(--text-primary); margin-bottom: 0.5rem; font-weight: 600;">
+                            <i class="bi bi-clock me-1"></i>
+                            Workout Protocol
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                            <div style="margin-bottom: 0.5rem;">
+                                <strong>Sets:</strong> ${exercise.sets}
+                            </div>
+                            <div>
+                                <strong>Rest:</strong> ${exercise.rest}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <h6 style="color: var(--text-primary); margin-bottom: 0.5rem;">
+                    <i class="bi bi-chat-quote me-1"></i>
+                    Description
+                </h6>
+                <p style="color: var(--text-secondary);">
+                    ${exercise.description}
+                </p>
+            </div>
+        `;
+        
+        modal.show();
+    }
+    
+    // Load previous analysis result
+    function loadAnalysisResult(index) {
+        if (index >= 0 && index < analysisHistory.length) {
+            const result = analysisHistory[index].result;
+            if (result) {
+                displayAnalysisResults(result);
+                document.getElementById('resultsCard').style.display = 'block';
+                document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }
+    
+    // Clear current analysis
+    function clearAnalysis() {
+        currentVideoFile = null;
+        document.getElementById('videoPreview').style.display = 'none';
+        document.getElementById('videoPreview').src = '';
+        document.getElementById('analyzeBtn').disabled = true;
+        document.getElementById('resultsCard').style.display = 'none';
+        document.getElementById('videoInput').value = '';
+        document.getElementById('videoNotes').value = '';
+        
+        document.getElementById('uploadArea').innerHTML = `
+            <i class="bi bi-cloud-upload"></i>
+            <h5 style="color: var(--text-primary);">Drop your training video here</h5>
+            <p style="color: var(--text-secondary);">or click to browse (MP4, MOV, AVI up to 100MB)</p>
+        `;
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        updateStats();
+        loadAnalysisHistory();
+    });
+</script>
+{% endblock %}

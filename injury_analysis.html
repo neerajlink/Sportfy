@@ -1,0 +1,694 @@
+{% extends 'base.html' %}
+
+{% block title %}Injury Analysis - Sports Injury Analysis{% endblock %}
+{% block breadcrumb %}Injury Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-camera-fill me-3" style="color: var(--primary);"></i>Injury Image Analysis</h1>
+    <p>Upload an image of your injury for AI-powered analysis and personalized recovery suggestions</p>
+</div>
+
+<div class="row g-4">
+    <!-- Upload Section -->
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-upload text-primary"></i>
+                    Upload Injury Image
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="upload-zone" id="uploadZone">
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                    <div class="upload-content" id="uploadContent">
+                        <div class="upload-icon">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                        </div>
+                        <h4>Drop your image here</h4>
+                        <p>or click to browse</p>
+                        <span class="upload-formats">Supports: JPG, PNG, WEBP</span>
+                    </div>
+                    <div class="upload-preview" id="uploadPreview" style="display: none;">
+                        <img id="previewImage" src="/placeholder.svg" alt="Preview">
+                        <button type="button" class="btn-remove-image" id="removeImage">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <label class="form-label" style="color: var(--text-primary); font-weight: 500;">
+                        <i class="bi bi-chat-left-text me-2"></i>Describe your injury (optional but recommended)
+                    </label>
+                    <textarea 
+                        class="form-control" 
+                        id="injuryDescription" 
+                        rows="4" 
+                        placeholder="E.g., 'I twisted my ankle while playing basketball. It's swollen and bruised on the outer side.'"
+                        style="background: var(--bg-tertiary); border-color: var(--border-color); color: var(--text-primary); resize: none;"
+                    ></textarea>
+                    <small class="text-muted">Providing details helps improve the accuracy of our analysis.</small>
+                </div>
+                
+                <button type="button" class="btn btn-primary w-100 mt-4" id="analyzeBtn" disabled>
+                    <i class="bi bi-search me-2"></i>Analyze Injury
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results Section -->
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-clipboard2-pulse text-success"></i>
+                    Analysis Results
+                </h5>
+                <span class="badge badge-info" id="confidenceBadge" style="display: none;">
+                    <i class="bi bi-robot me-1"></i>AI Analysis
+                </span>
+            </div>
+            <div class="card-body">
+                <!-- Initial State -->
+                <div id="initialState" class="text-center py-5">
+                    <div class="empty-state-icon mb-4">
+                        <i class="bi bi-image" style="font-size: 4rem; color: var(--text-muted);"></i>
+                    </div>
+                    <h4 style="color: var(--text-secondary);">No Image Uploaded</h4>
+                    <p class="text-muted">Upload an injury image to receive personalized analysis and recovery suggestions.</p>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="loadingState" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary mb-4" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h4 style="color: var(--text-primary);">Analyzing Your Injury...</h4>
+                    <p class="text-muted">Our AI is examining the image and preparing suggestions.</p>
+                </div>
+                
+                <!-- Results State -->
+                <div id="resultsState" style="display: none;">
+                    <!-- Injury Type Header -->
+                    <div class="injury-type-header mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="injury-icon">
+                                <i class="bi bi-bandaid-fill"></i>
+                            </div>
+                            <div>
+                                <h3 id="injuryName" style="color: var(--text-primary); margin: 0;">-</h3>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span class="badge badge-success" id="confidenceScore">-</span>
+                                    <span class="text-muted" id="recoveryTime">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="result-section mb-4">
+                        <p id="injuryDescription2" style="color: var(--text-secondary); line-height: 1.7;">-</p>
+                    </div>
+                    
+                    <!-- Severity Levels -->
+                    <div class="result-section mb-4" id="severitySection">
+                        <h5 class="section-title">
+                            <i class="bi bi-speedometer2 text-warning"></i>
+                            Severity Levels
+                        </h5>
+                        <div id="severityLevels" class="severity-cards">
+                            <!-- Filled by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Immediate Care -->
+                    <div class="result-section mb-4">
+                        <h5 class="section-title">
+                            <i class="bi bi-heart-pulse text-danger"></i>
+                            Immediate Care
+                        </h5>
+                        <ul id="immediateCare" class="care-list">
+                            <!-- Filled by JavaScript -->
+                        </ul>
+                    </div>
+                    
+                    <!-- Recovery Tips -->
+                    <div class="result-section mb-4">
+                        <h5 class="section-title">
+                            <i class="bi bi-clipboard-check text-success"></i>
+                            Recovery Tips
+                        </h5>
+                        <ul id="recoveryTips" class="care-list success">
+                            <!-- Filled by JavaScript -->
+                        </ul>
+                    </div>
+                    
+                    <!-- Warning Signs -->
+                    <div class="result-section">
+                        <h5 class="section-title">
+                            <i class="bi bi-exclamation-triangle text-danger"></i>
+                            Seek Medical Attention If
+                        </h5>
+                        <ul id="warningSigns" class="care-list warning">
+                            <!-- Filled by JavaScript -->
+                        </ul>
+                    </div>
+                    
+                    <!-- Disclaimer -->
+                    <div class="disclaimer-box mt-4">
+                        <i class="bi bi-info-circle"></i>
+                        <div>
+                            <strong>Medical Disclaimer:</strong> This analysis is for informational purposes only and should not replace professional medical advice. Always consult a healthcare provider for proper diagnosis and treatment.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tips Section -->
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-lightbulb text-warning"></i>
+                    Tips for Best Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="tip-card">
+                            <div class="tip-icon cyan">
+                                <i class="bi bi-camera"></i>
+                            </div>
+                            <h6>Good Lighting</h6>
+                            <p>Take photos in well-lit areas for clearer analysis</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="tip-card">
+                            <div class="tip-icon purple">
+                                <i class="bi bi-zoom-in"></i>
+                            </div>
+                            <h6>Close-Up Shot</h6>
+                            <p>Focus on the injured area for better details</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="tip-card">
+                            <div class="tip-icon green">
+                                <i class="bi bi-chat-text"></i>
+                            </div>
+                            <h6>Add Description</h6>
+                            <p>Describe how the injury occurred for better analysis</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="tip-card">
+                            <div class="tip-icon amber">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <h6>Note Timeline</h6>
+                            <p>Mention when the injury happened</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .upload-zone {
+        border: 2px dashed var(--border-color);
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--bg-tertiary);
+        min-height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .upload-zone:hover, .upload-zone.drag-over {
+        border-color: var(--primary);
+        background: rgba(6, 182, 212, 0.05);
+    }
+    
+    .upload-content {
+        width: 100%;
+    }
+    
+    .upload-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: white;
+        box-shadow: var(--glow);
+    }
+    
+    .upload-zone h4 {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-zone p {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    }
+    
+    .upload-formats {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        background: var(--bg-secondary);
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+    }
+    
+    .upload-preview {
+        position: relative;
+        width: 100%;
+    }
+    
+    .upload-preview img {
+        max-width: 100%;
+        max-height: 250px;
+        border-radius: 12px;
+        object-fit: contain;
+    }
+    
+    .btn-remove-image {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--danger);
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-remove-image:hover {
+        transform: scale(1.1);
+    }
+    
+    .injury-type-header {
+        padding: 1.5rem;
+        background: var(--bg-tertiary);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+    
+    .injury-icon {
+        width: 56px;
+        height: 56px;
+        background: var(--gradient-primary);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .section-title i {
+        font-size: 1.1rem;
+    }
+    
+    .severity-cards {
+        display: grid;
+        gap: 1rem;
+    }
+    
+    .severity-card {
+        padding: 1rem;
+        background: var(--bg-tertiary);
+        border-radius: 10px;
+        border-left: 4px solid var(--primary);
+    }
+    
+    .severity-card.mild {
+        border-left-color: var(--success);
+    }
+    
+    .severity-card.moderate {
+        border-left-color: var(--warning);
+    }
+    
+    .severity-card.severe, .severity-card.grade_3 {
+        border-left-color: var(--danger);
+    }
+    
+    .severity-card h6 {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+    
+    .severity-card p {
+        color: var(--text-secondary);
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    .care-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .care-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 0.75rem 1rem;
+        background: var(--bg-tertiary);
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+    
+    .care-list li::before {
+        content: '•';
+        color: var(--primary);
+        font-weight: bold;
+        font-size: 1.2rem;
+        line-height: 1;
+    }
+    
+    .care-list.success li::before {
+        color: var(--success);
+    }
+    
+    .care-list.warning li::before {
+        color: var(--danger);
+    }
+    
+    .disclaimer-box {
+        display: flex;
+        gap: 12px;
+        padding: 1rem;
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        border-radius: 10px;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    
+    .disclaimer-box i {
+        color: var(--warning);
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    .tip-card {
+        text-align: center;
+        padding: 1.5rem;
+        background: var(--bg-tertiary);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+    }
+    
+    .tip-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
+    
+    .tip-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin: 0 auto 1rem;
+        color: white;
+    }
+    
+    .tip-icon.cyan { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+    .tip-icon.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .tip-icon.green { background: linear-gradient(135deg, #10b981, #059669); }
+    .tip-icon.amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    
+    .tip-card h6 {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .tip-card p {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin: 0;
+    }
+</style>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    console.log('[v0] Initializing injury analysis page...');
+    
+    const uploadZone = document.getElementById('uploadZone');
+    const imageInput = document.getElementById('imageInput');
+    const uploadContent = document.getElementById('uploadContent');
+    const uploadPreview = document.getElementById('uploadPreview');
+    const previewImage = document.getElementById('previewImage');
+    const removeImageBtn = document.getElementById('removeImage');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const injuryDescription = document.getElementById('injuryDescription');
+    
+    // States
+    const initialState = document.getElementById('initialState');
+    const loadingState = document.getElementById('loadingState');
+    const resultsState = document.getElementById('resultsState');
+    const confidenceBadge = document.getElementById('confidenceBadge');
+    
+    let currentImageData = null;
+    
+    // Click to upload
+    uploadZone.addEventListener('click', () => {
+        if (!currentImageData) {
+            imageInput.click();
+        }
+    });
+    
+    // Drag and drop
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('drag-over');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('drag-over');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            handleFile(file);
+        } else {
+            console.error('[v0] Invalid file type dropped');
+            alert('Please drop a valid image file (JPG, PNG, WEBP)');
+        }
+    });
+    
+    // File input change
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            handleFile(file);
+        }
+    });
+    
+    // Handle file
+    function handleFile(file) {
+        console.log('[v0] Processing image file:', file.name);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            currentImageData = e.target.result;
+            previewImage.src = currentImageData;
+            uploadContent.style.display = 'none';
+            uploadPreview.style.display = 'block';
+            analyzeBtn.disabled = false;
+            console.log('[v0] Image loaded successfully');
+        };
+        reader.onerror = (e) => {
+            console.error('[v0] Error reading file:', e);
+            alert('Error reading image file. Please try again.');
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // Remove image
+    removeImageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentImageData = null;
+        previewImage.src = '';
+        uploadContent.style.display = 'block';
+        uploadPreview.style.display = 'none';
+        analyzeBtn.disabled = true;
+        imageInput.value = '';
+        
+        // Reset results
+        initialState.style.display = 'block';
+        resultsState.style.display = 'none';
+        confidenceBadge.style.display = 'none';
+        console.log('[v0] Image removed');
+    });
+    
+    // Analyze button
+    analyzeBtn.addEventListener('click', async () => {
+        if (!currentImageData) {
+            console.error('[v0] No image data available');
+            return;
+        }
+        
+        console.log('[v0] Starting injury analysis...');
+        
+        // Show loading
+        initialState.style.display = 'none';
+        resultsState.style.display = 'none';
+        loadingState.style.display = 'block';
+        analyzeBtn.disabled = true;
+        
+        try {
+            const response = await fetch('/api/analyze-injury', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    image: currentImageData,
+                    description: injuryDescription.value
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('[v0] Analysis complete:', data);
+            
+            if (data.success && data.analysis) {
+                displayResults(data.analysis);
+            } else {
+                throw new Error(data.error || 'Analysis failed');
+            }
+        } catch (error) {
+            console.error('[v0] Error during analysis:', error);
+            loadingState.style.display = 'none';
+            initialState.style.display = 'block';
+            alert('Error analyzing injury: ' + error.message + '. Please try again.');
+        } finally {
+            analyzeBtn.disabled = false;
+        }
+    });
+    
+    function displayResults(analysis) {
+        console.log('[v0] Displaying analysis results');
+        
+        // Show results
+        loadingState.style.display = 'none';
+        resultsState.style.display = 'block';
+        confidenceBadge.style.display = 'inline-block';
+        
+        // Update header
+        document.getElementById('injuryName').textContent = analysis.injury_name || 'Unknown Injury';
+        document.getElementById('confidenceScore').textContent = `${Math.round(analysis.confidence * 100)}% Confidence`;
+        document.getElementById('recoveryTime').textContent = `Estimated: ${analysis.estimated_recovery || 'Varies'}`;
+        
+        // Update description
+        document.getElementById('injuryDescription2').textContent = analysis.description || '';
+        
+        // Update severity levels
+        const severitySection = document.getElementById('severitySection');
+        const severityLevels = document.getElementById('severityLevels');
+        severityLevels.innerHTML = '';
+        
+        if (analysis.severity_levels && Object.keys(analysis.severity_levels).length > 0) {
+            severitySection.style.display = 'block';
+            for (const [level, desc] of Object.entries(analysis.severity_levels)) {
+                const card = document.createElement('div');
+                card.className = `severity-card ${level.toLowerCase()}`;
+                card.innerHTML = `<h6>${level}</h6><p>${desc}</p>`;
+                severityLevels.appendChild(card);
+            }
+        } else {
+            severitySection.style.display = 'none';
+        }
+        
+        // Update immediate care
+        const immediateCare = document.getElementById('immediateCare');
+        immediateCare.innerHTML = '';
+        if (analysis.immediate_care && analysis.immediate_care.length > 0) {
+            analysis.immediate_care.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                immediateCare.appendChild(li);
+            });
+        }
+        
+        // Update recovery tips
+        const recoveryTips = document.getElementById('recoveryTips');
+        recoveryTips.innerHTML = '';
+        if (analysis.recovery_tips && analysis.recovery_tips.length > 0) {
+            analysis.recovery_tips.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                recoveryTips.appendChild(li);
+            });
+        }
+        
+        // Update warning signs
+        const warningSigns = document.getElementById('warningSigns');
+        warningSigns.innerHTML = '';
+        if (analysis.warning_signs && analysis.warning_signs.length > 0) {
+            analysis.warning_signs.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                warningSigns.appendChild(li);
+            });
+        }
+    }
+    
+    console.log('[v0] Injury analysis page initialized successfully');
+</script>
+{% endblock %}

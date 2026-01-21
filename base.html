@@ -1,0 +1,3694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sportfy - Sports Injury Analytics{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Add Chart.js CDN for charts to work -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Professional Modern Light Theme */
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent-primary: #2563eb;
+            --accent-secondary: #7c3aed;
+            --accent-success: #059669;
+            --accent-warning: #d97706;
+            --accent-danger: #dc2626;
+            --border-color: #d1d5db;
+            --hover-bg: rgba(37, 99, 235, 0.08);
+            --sidebar-width: 270px;
+            --sidebar-collapsed: 70px;
+            --header-height: 70px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Modern gradient accents */
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            --gradient-success: linear-gradient(135deg, #059669 0%, #047857 100%);
+            --gradient-warning: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            --gradient-danger: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            /* Sporty vibrant accent */
+            --gradient-sport: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);
+            /* Card and chart specific colors */
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --chart-grid: #e5e7eb;
+            --chart-text: #374151;
+            --table-header-bg: #f3f4f6;
+            --table-row-hover: #f9fafb;
+            --table-border: #e5e7eb;
+        }
+
+        /* Professional Modern Dark Theme with maximum contrast */
+        [data-theme="dark"] {
+            --bg-primary: #06111b;
+            --bg-secondary: #0f1419;
+            --bg-tertiary: #1a202c;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #2d3748;
+            --hover-bg: rgba(37, 99, 235, 0.12);
+            --card-bg: #1a202c;
+            --card-border: #2d3748;
+            --chart-grid: rgba(255, 255, 255, 0.1);
+            --chart-text: #f0f1f3;
+            --table-header-bg: #1f2937;
+            --table-row-hover: #2d3748;
+            --table-border: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header - Professional Premium Style */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        [data-theme="dark"] .top-header {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .sidebar-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.6rem;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+            transform: scale(1.05);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 800;
+            font-size: 1.4rem;
+            background: var(--gradient-sport);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .brand i {
+            font-size: 1.6rem;
+            background: var(--gradient-sport);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-search {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-search input {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            color: var(--text-primary);
+            width: 300px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .header-search input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .header-search input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            width: 350px;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .header-search i {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Enhanced voice navigation button with Coach Bolt activation indicator */
+        .voice-nav-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .voice-nav-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .voice-nav-btn:active {
+            transform: scale(0.95);
+        }
+
+        .voice-nav-btn.listening {
+            animation: pulse-ring 1.5s infinite;
+            background: linear-gradient(135deg, var(--accent-danger), var(--accent-warning));
+        }
+
+        .voice-nav-btn.listening::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-danger), var(--accent-warning));
+            opacity: 0.4;
+            animation: pulse-wave 1.5s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+            }
+        }
+
+        @keyframes pulse-wave {
+            0% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        /* Voice feedback toast */
+        .voice-toast {
+            position: fixed;
+            top: 90px;
+            right: 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            display: none;
+            min-width: 320px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        [data-theme="dark"] .voice-toast {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .voice-toast.show {
+            display: block;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .voice-toast-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .voice-toast-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .voice-toast-icon.listening {
+            background: linear-gradient(135deg, var(--accent-danger), var(--accent-warning));
+        }
+
+        .voice-toast-icon.processing {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+        }
+
+        .voice-toast-icon.success {
+            background: var(--accent-success);
+        }
+
+        .voice-toast-icon.error {
+            background: var(--accent-danger);
+        }
+
+        .voice-toast-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .voice-toast-message {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .voice-waveform {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 0.75rem;
+            justify-content: center;
+        }
+
+        .voice-wave-bar {
+            width: 4px;
+            height: 20px;
+            background: var(--accent-primary);
+            border-radius: 3px;
+            animation: wave 1s ease-in-out infinite;
+        }
+
+        .voice-wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .voice-wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .voice-wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .voice-wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0%, 100% { height: 20px; }
+            50% { height: 6px; }
+        }
+
+        /* Search results dropdown styling */
+        .search-results {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        [data-theme="dark"] .search-results {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .search-results.show {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .search-result-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-primary);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .search-result-content {
+            flex: 1;
+        }
+
+        .search-result-title {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .search-result-meta {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .search-no-results {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: var(--header-height);
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--header-height));
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            overflow-x: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .nav-section {
+            padding: 1.5rem 0;
+        }
+
+        .nav-section-title {
+            padding: 0 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .nav-item {
+            list-style: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border-left-color: var(--accent-primary);
+        }
+
+        .nav-link.active {
+            background: var(--hover-bg);
+            color: var(--accent-primary);
+            border-left-color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            font-size: 1.25rem;
+            min-width: 1.25rem;
+        }
+
+        .nav-link-text {
+            white-space: nowrap;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar.collapsed .nav-link-text {
+            opacity: 0;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            padding: 0.2rem 0.6rem;
+            background: var(--accent-danger);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            border-radius: 12px;
+            letter-spacing: 0.02em;
+        }
+
+        .sidebar.collapsed .nav-badge {
+            display: none;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 2rem;
+            min-height: calc(100vh - var(--header-height));
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent-primary);
+            transform: rotate(15deg);
+        }
+
+        /* Professional Modern Cards with Enhanced Visuals */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-sport);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        [data-theme="dark"] .card {
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.35);
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-primary);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        [data-theme="dark"] .card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-header {
+            background: var(--bg-tertiary);
+            border-bottom: 2px solid var(--border-color);
+            padding: 1.25rem 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-radius: 18px 18px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-title {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Premium Modern Buttons */
+        .btn-primary {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.25s;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            border: 1.5px solid var(--border-color);
+            color: var(--text-primary) !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.25s;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            border: none;
+            color: white !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.25s;
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.5);
+        }
+
+        .btn-danger {
+            background: var(--gradient-danger);
+            border: none;
+            color: white !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.25s;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
+        }
+
+        .btn-warning {
+            background: var(--gradient-warning);
+            border: none;
+            color: white !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.25s;
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(217, 119, 6, 0.5);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* Premium Modern Stat Cards */
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-sport);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: right 0.5s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+            border-color: var(--accent-primary);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:hover::after {
+            right: 100%;
+        }
+
+        [data-theme="dark"] .stat-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Professional Modern Stat Icons */
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            flex-shrink: 0;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .stat-icon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            background: inherit;
+            opacity: 0.25;
+            filter: blur(14px);
+        }
+
+        .stat-icon.cyan {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.35);
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.35);
+        }
+
+        .stat-icon.red {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
+        }
+
+        .stat-icon.amber {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+        }
+
+        .stat-icon.pink {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.35);
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+        }
+
+        .stat-icon.indigo {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        .stat-icon.teal {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.35);
+        }
+
+        .stat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .stat-info h3 {
+            font-size: 2.25rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin: 0 0 0.25rem 0;
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .stat-info p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin: 0 0 0.5rem 0;
+            font-weight: 600;
+        }
+
+        .stat-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 10px;
+            font-weight: 700;
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--accent-primary);
+        }
+
+        .stat-trend.up {
+            background: rgba(5, 150, 105, 0.15);
+            color: var(--accent-success);
+        }
+
+        .stat-trend.down {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-danger);
+        }
+
+        .stat-trend i {
+            font-size: 0.85rem;
+        }
+
+        /* Enhanced text contrast for both themes */
+        .text-primary {
+            color: var(--text-primary) !important;
+        }
+
+        .text-secondary {
+            color: var(--text-secondary) !important;
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        /* Ensure proper contrast for all text elements */
+        body, p, span, div, label {
+            color: var(--text-primary);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* Enhanced table styles for better visibility in both modes */
+        /* Professional Modern Table Styling */
+        .table {
+            color: var(--text-primary);
+            border-color: var(--table-border);
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: var(--table-header-bg);
+            color: var(--text-primary);
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-color);
+            padding: 1.15rem 1.25rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        [data-theme="dark"] .table thead th {
+            background: rgba(31, 41, 55, 0.8);
+        }
+
+        .table tbody td {
+            color: var(--text-primary);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--table-border);
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            transition: all 0.25s ease;
+        }
+
+        .table tbody tr:hover {
+            background: var(--table-row-hover);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .table tbody tr:hover {
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+
+        .table tbody tr:hover td {
+            color: var(--text-primary);
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background: var(--bg-tertiary);
+        }
+
+        [data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Button text contrast */
+        .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info {
+            color: white !important;
+        }
+
+        /* Professional Modern Form Controls */
+        .form-control, .form-select {
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem 1.15rem;
+            font-weight: 500;
+            transition: all 0.25s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        /* Professional Modern Badges */
+        .badge {
+            font-weight: 700;
+            padding: 0.5rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .badge-success {
+            background: var(--gradient-success);
+            color: white;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+        }
+
+        .badge-danger {
+            background: var(--gradient-danger);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+        }
+
+        .badge-warning {
+            background: var(--gradient-warning);
+            color: white;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+        }
+
+        .badge-info {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .badge-purple {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+        }
+
+        /* Alert text contrast */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #065f46 !important;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #991b1b !important;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: #92400e !important;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.15);
+            color: #1e40af !important;
+        }
+
+        [data-theme="dark"] .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7 !important;
+        }
+
+        [data-theme="dark"] .alert-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5 !important;
+        }
+
+        [data-theme="dark"] .alert-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d !important;
+        }
+
+        [data-theme="dark"] .alert-info {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd !important;
+        }
+
+        /* Chart container styles for better visibility */
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--card-border);
+        }
+
+        /* Badges */
+        .badge {
+            font-weight: 600;
+            padding: 0.4rem 0.75rem;
+            border-radius: 8px;
+        }
+
+        .badge.bg-success {
+            background: var(--accent-success) !important;
+        }
+
+        .badge.bg-danger {
+            background: var(--accent-danger) !important;
+        }
+
+        .badge.bg-warning {
+            background: var(--accent-warning) !important;
+            color: #1f2937 !important;
+        }
+
+        .badge.bg-info {
+            background: var(--accent-primary) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header-search input {
+                width: 200px;
+            }
+
+            .header-search input:focus {
+                width: 250px;
+            }
+        }
+
+        /* Enhanced Robot Mascot Chatbot Styles with hidden by default */
+        .robot-chatbot-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 90px;
+            height: 110px;
+            border-radius: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 9998;
+            display: none; /* Hidden by default until activated */
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            animation: robot-hover 3s ease-in-out infinite;
+            filter: drop-shadow(0 10px 30px rgba(249, 115, 22, 0.4));
+        }
+
+        /* Show class for when Coach Bolt is activated */
+        .robot-chatbot-toggle.activated {
+            display: flex;
+        }
+
+        @keyframes robot-hover {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            25% { transform: translateY(-8px) rotate(2deg); }
+            50% { transform: translateY(-4px) rotate(-1deg); }
+            75% { transform: translateY(-10px) rotate(1deg); }
+        }
+
+        .robot-chatbot-toggle:hover {
+            animation: robot-wave 0.5s ease-in-out;
+            filter: drop-shadow(0 15px 40px rgba(249, 115, 22, 0.6));
+        }
+
+        @keyframes robot-wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-15deg); }
+            75% { transform: rotate(15deg); }
+        }
+
+        .robot-chatbot-toggle.open {
+            animation: none;
+            transform: scale(0.9);
+        }
+
+        .robot-mascot {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Speech Bubble */
+        .robot-speech-bubble {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            color: #1e293b;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            animation: speech-appear 4s ease-in-out infinite;
+        }
+
+        .robot-speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid white;
+        }
+
+        @keyframes speech-appear {
+            0%, 70%, 100% { opacity: 0; transform: translateX(-50%) translateY(5px); }
+            75%, 95% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .robot-chatbot-toggle:hover .robot-speech-bubble {
+            opacity: 1;
+            animation: none;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Robot Body Parts Animations */
+        .robot-antenna-light {
+            animation: antenna-blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes antenna-blink {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px #22c55e); }
+            50% { opacity: 0.5; filter: drop-shadow(0 0 15px #22c55e); }
+        }
+
+        .robot-eye-glow {
+            animation: eye-scan 3s ease-in-out infinite;
+        }
+
+        @keyframes eye-scan {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .robot-eye-pupil {
+            animation: eye-move 4s ease-in-out infinite;
+        }
+
+        @keyframes eye-move {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(2px); }
+            75% { transform: translateX(-2px); }
+        }
+
+        .robot-mouth-bar {
+            animation: mouth-talk 0.3s ease-in-out infinite alternate;
+        }
+
+        .robot-chatbot-toggle:hover .robot-mouth-bar {
+            animation: mouth-talk-fast 0.15s ease-in-out infinite alternate;
+        }
+
+        @keyframes mouth-talk {
+            0% { transform: scaleY(1); }
+            100% { transform: scaleY(0.6); }
+        }
+
+        @keyframes mouth-talk-fast {
+            0% { transform: scaleY(1); }
+            100% { transform: scaleY(0.3); }
+        }
+
+        .robot-arm {
+            transform-origin: top center;
+            animation: arm-idle 2s ease-in-out infinite;
+        }
+
+        .robot-arm-left {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes arm-idle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .robot-chatbot-toggle:hover .robot-arm-right {
+            animation: arm-wave 0.4s ease-in-out infinite;
+        }
+
+        @keyframes arm-wave {
+            0%, 100% { transform: rotate(-20deg); }
+            50% { transform: rotate(30deg); }
+        }
+
+        /* Chatbot Container */
+        .robot-chatbot-container {
+            position: fixed;
+            bottom: 9rem;
+            right: 2rem;
+            width: 420px;
+            height: 580px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--robot-primary);
+            border-radius: 28px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3), 0 0 50px var(--robot-glow), inset 0 1px 0 rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(40px) scale(0.85);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+
+        .robot-chatbot-container.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Robot Header */
+        .robot-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            border-bottom: 3px solid var(--robot-primary);
+        }
+
+        .robot-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.5), transparent);
+        }
+
+        .robot-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.8), transparent);
+            animation: header-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes header-glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .robot-header-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1;
+        }
+
+        .robot-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #334155, #1e293b);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 2px solid var(--robot-primary);
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3), inset 0 2px 4px rgba(255,255,255,0.1);
+        }
+
+        .robot-header-text h4 {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+            letter-spacing: 0.5px;
+        }
+
+        .robot-status {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 4px;
+        }
+
+        .robot-status-dot {
+            width: 10px;
+            height: 10px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e, 0 0 20px #22c55e;
+            animation: status-pulse 1.5s infinite;
+        }
+
+        @keyframes status-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 10px #22c55e; }
+            50% { transform: scale(1.2); box-shadow: 0 0 20px #22c55e, 0 0 30px #22c55e; }
+        }
+
+        .robot-close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 1;
+        }
+
+        .robot-close-btn:hover {
+            background: var(--robot-primary);
+            border-color: var(--robot-primary);
+            transform: rotate(90deg);
+        }
+
+        /* Page Context Banner */
+        .page-context-banner {
+            background: linear-gradient(90deg, rgba(249, 115, 22, 0.1), transparent);
+            padding: 0.875rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+        }
+
+        .context-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--robot-primary), #ea580c);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        .context-text {
+            flex: 1;
+        }
+
+        .context-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 500;
+        }
+
+        .context-page {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* Chat Messages */
+        .robot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+        }
+
+        .robot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .robot-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .robot-messages::-webkit-scrollbar-thumb {
+            background: var(--robot-primary);
+            border-radius: 3px;
+        }
+
+        .robot-message {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 90%;
+            animation: message-slide-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes message-slide-in {
+            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .robot-message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .robot-msg-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .robot-message.bot .robot-msg-avatar {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: 2px solid var(--robot-primary);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.25);
+        }
+
+        .robot-message.user .robot-msg-avatar {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .robot-msg-content {
+            padding: 1rem 1.125rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            line-height: 1.65;
+        }
+
+        .robot-message.bot .robot-msg-content {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .robot-message.user .robot-msg-content {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .robot-msg-content p {
+            margin: 0;
+            color: inherit;
+        }
+
+        /* Input area */
+        .robot-input-area {
+            padding: 1rem 1.25rem;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .robot-input-area input {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 0.875rem 1.25rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .robot-input-area input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .robot-input-area input:focus {
+            outline: none;
+            border-color: var(--robot-primary);
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+        }
+
+        .robot-send-btn {
+            background: linear-gradient(135deg, var(--robot-primary), #ea580c);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+        }
+
+        .robot-send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+        }
+
+        /* Wake word activation overlay */
+        .wake-word-overlay {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-primary);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            z-index: 9997;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            animation: float-in 0.5s ease;
+        }
+
+        [data-theme="dark"] .wake-word-overlay {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .wake-word-overlay.hidden {
+            display: none;
+        }
+
+        @keyframes float-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .wake-word-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+            }
+        }
+
+        .wake-word-text {
+            text-align: center;
+        }
+
+        .wake-word-text h4 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .wake-word-text p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .wake-word-hint {
+            background: var(--bg-tertiary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--accent-primary);
+            font-weight: 600;
+            border: 1px dashed var(--accent-primary);
+        }
+
+        .wake-word-btn {
+            background: var(--gradient-primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .wake-word-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .wake-word-btn.listening {
+            background: linear-gradient(135deg, var(--accent-danger), var(--accent-warning));
+            animation: btn-pulse 1s infinite;
+        }
+
+        @keyframes btn-pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+            }
+        }
+
+        /* Professional Modern Progress Bars */
+        .progress {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            height: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .progress-bar {
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Dynamic Chart Container Animations */
+        .chart-container {
+            position: relative;
+            animation: chartFadeIn 0.6s ease-out;
+        }
+
+        @keyframes chartFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Graph and chart text visibility improvements */
+        canvas {
+            color: var(--chart-text);
+        }
+
+        /* Page header styling */
+        .page-header {
+            margin-bottom: 2rem;
+            animation: pageHeaderSlideIn 0.4s ease-out;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        @keyframes pageHeaderSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Smooth row animations */
+        .row {
+            animation: rowFadeIn 0.5s ease-out;
+        }
+
+        @keyframes rowFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced tooltip styling */
+        .tooltip-inner {
+            background: var(--text-primary);
+            color: var(--bg-secondary);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+    </style>
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+    <!-- Audio element for energetic song -->
+    <audio id="energeticSong" preload="auto">
+        <source src="{{ url_for('static', filename='audio/energetic_song.mp3') }}" type="audio/mpeg">
+    </audio>
+
+    <!-- Header -->
+    <header class="top-header">
+        <div class="header-left">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <a href="{{ url_for('home') }}" class="brand">
+                <i class="bi bi-activity"></i>
+                Sportfy
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="header-search">
+                <i class="bi bi-search"></i>
+                <input type="text" id="globalSearch" placeholder="Search players, injuries, teams..." autocomplete="off">
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            <button class="voice-nav-btn" id="voiceNavBtn" title="Voice Commands - Say 'Hey Coach Bolt Come up' to activate assistant">
+                <i class="bi bi-mic-fill"></i>
+            </button>
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="bi bi-moon-fill"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Voice Toast -->
+    <div class="voice-toast" id="voiceToast">
+        <div class="voice-toast-header">
+            <div class="voice-toast-icon" id="voiceToastIcon">
+                <i class="bi bi-mic-fill"></i>
+            </div>
+            <span class="voice-toast-title" id="voiceToastTitle">Listening...</span>
+        </div>
+        <p class="voice-toast-message" id="voiceToastMessage">Speak your command...</p>
+        <div class="voice-waveform" id="voiceWaveform">
+            <div class="voice-wave-bar"></div>
+            <div class="voice-wave-bar"></div>
+            <div class="voice-wave-bar"></div>
+            <div class="voice-wave-bar"></div>
+            <div class="voice-wave-bar"></div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <nav>
+            <div class="nav-section">
+                <h6 class="nav-section-title">
+                    <i class="bi bi-grid"></i>
+                    MAIN MENU
+                </h6>
+                <ul style="list-style: none; padding: 0;">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}">
+                            <i class="bi bi-speedometer2"></i>
+                            <span class="nav-link-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'players' %}active{% endif %}" href="{{ url_for('players') }}">
+                            <i class="bi bi-people"></i>
+                            <span class="nav-link-text">Players</span>
+                            <span class="nav-badge">2K</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'analytics' %}active{% endif %}" href="{{ url_for('analytics') }}">
+                            <i class="bi bi-bar-chart"></i>
+                            <span class="nav-link-text">Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'statistics' %}active{% endif %}" href="{{ url_for('statistics') }}">
+                            <i class="bi bi-graph-up"></i>
+                            <span class="nav-link-text">Statistics</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <h6 class="nav-section-title">
+                    <i class="bi bi-search"></i>
+                    ANALYSIS
+                </h6>
+                <ul style="list-style: none; padding: 0;">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'predictions' %}active{% endif %}" href="{{ url_for('predictions') }}">
+                            <i class="bi bi-shield-check"></i>
+                            <span class="nav-link-text">Risk Predictions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'injury_analysis' %}active{% endif %}" href="{{ url_for('injury_analysis') }}">
+                            <i class="bi bi-camera"></i>
+                            <span class="nav-link-text">Injury Analysis</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}" href="{{ url_for('reports') }}">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span class="nav-link-text">Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <h6 class="nav-section-title">
+                    <i class="bi bi-star"></i>
+                    NEW FEATURES
+                </h6>
+                <ul style="list-style: none; padding: 0;">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'treatment_timeline' %}active{% endif %}" href="{{ url_for('treatment_timeline') }}">
+                            <i class="bi bi-calendar-check"></i>
+                            <span class="nav-link-text">Treatment Timeline</span>
+                            <span class="nav-badge">NEW</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'medication_tracker' %}active{% endif %}" href="{{ url_for('medication_tracker') }}">
+                            <i class="bi bi-capsule"></i>
+                            <span class="nav-link-text">Medication Tracker</span>
+                            <span class="nav-badge">NEW</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'second_opinion' %}active{% endif %}" href="{{ url_for('second_opinion') }}">
+                            <i class="bi bi-chat-square-dots"></i>
+                            <span class="nav-link-text">Second Opinion</span>
+                            <span class="nav-badge">NEW</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'gait_analysis' %}active{% endif %}" href="{{ url_for('gait_analysis') }}">
+                            <i class="bi bi-person-walking"></i>
+                            <span class="nav-link-text">Gait Analysis</span>
+                            <span class="nav-badge" style="background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);">NEW</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'return_to_play' %}active{% endif %}" href="{{ url_for('return_to_play') }}">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            <span class="nav-link-text">Return-to-Play</span>
+                            <span class="nav-badge" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">PRO</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'fitness_products' %}active{% endif %}" href="{{ url_for('fitness_products') }}">
+                            <i class="bi bi-cart-check"></i>
+                            <span class="nav-link-text">Fitness Products</span>
+                            <span class="nav-badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">DEALS</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main content area -->
+    <main class="main-content" id="mainContent">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Wake Word Activation Overlay for Coach Bolt -->
+    <div class="wake-word-overlay" id="wakeWordOverlay">
+        <div class="wake-word-icon">
+            <i class="bi bi-robot"></i>
+        </div>
+        <div class="wake-word-text">
+            <h4>Summon Coach Bolt</h4>
+            <p>Click the button and say the magic words!</p>
+        </div>
+        <div class="wake-word-hint">"Hey Coach Bolt Come up"</div>
+        <button class="wake-word-btn" id="wakeWordBtn">
+            <i class="bi bi-mic-fill"></i>
+            <span>Activate Voice</span>
+        </button>
+    </div>
+
+    <!-- Sporty Robot Mascot Chatbot -->
+    <button id="robotChatbotToggle" class="robot-chatbot-toggle" onclick="toggleRobotChatbot()">
+        <div class="robot-mascot">
+            <!-- Speech Bubble -->
+            <div class="robot-speech-bubble">Hey! Need help? Click me!</div>
+            
+            <svg viewBox="0 0 90 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Glow Effects -->
+                <defs>
+                    <linearGradient id="robotBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#334155"/>
+                        <stop offset="50%" style="stop-color:#1e293b"/>
+                        <stop offset="100%" style="stop-color:#0f172a"/>
+                    </linearGradient>
+                    <linearGradient id="robotAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f97316"/>
+                        <stop offset="100%" style="stop-color:#ea580c"/>
+                    </linearGradient>
+                    <linearGradient id="eyeGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#22d3ee"/>
+                        <stop offset="100%" style="stop-color:#06b6d4"/>
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    <filter id="shadowFilter">
+                        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+                    </filter>
+                </defs>
+                
+                <!-- Antenna -->
+                <g class="robot-antenna">
+                    <rect x="42" y="8" width="6" height="14" rx="3" fill="url(#robotBodyGrad)" stroke="#475569" stroke-width="1"/>
+                    <circle cx="45" cy="6" r="6" fill="#22c55e" class="robot-antenna-light" filter="url(#glow)"/>
+                    <circle cx="45" cy="6" r="3" fill="#4ade80"/>
+                </g>
+                
+                <!-- Robot Head -->
+                <g filter="url(#shadowFilter)">
+                    <!-- Head Base -->
+                    <rect x="15" y="20" width="60" height="45" rx="12" fill="url(#robotBodyGrad)" stroke="#475569" stroke-width="2"/>
+                    
+                    <!-- Headband (Sporty Element) -->
+                    <rect x="12" y="28" width="66" height="10" rx="5" fill="url(#robotAccent)"/>
+                    <text x="45" y="36" text-anchor="middle" fill="white" font-size="6" font-weight="bold" font-family="Arial">COACH</text>
+                    
+                    <!-- Face Plate -->
+                    <rect x="20" y="40" width="50" height="22" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+                    
+                    <!-- Eyes Container -->
+                    <g class="robot-eye-glow">
+                        <!-- Left Eye -->
+                        <ellipse cx="32" cy="48" rx="8" ry="7" fill="#0c4a6e"/>
+                        <ellipse cx="32" cy="48" rx="6" ry="5" fill="url(#eyeGlow)" filter="url(#glow)"/>
+                        <g class="robot-eye-pupil">
+                            <circle cx="33" cy="48" r="2.5" fill="#0f172a"/>
+                            <circle cx="34" cy="47" r="1" fill="white"/>
+                        </g>
+                        
+                        <!-- Right Eye -->
+                        <ellipse cx="58" cy="48" rx="8" ry="7" fill="#0c4a6e"/>
+                        <ellipse cx="58" cy="48" rx="6" ry="5" fill="url(#eyeGlow)" filter="url(#glow)"/>
+                        <g class="robot-eye-pupil">
+                            <circle cx="59" cy="48" r="2.5" fill="#0f172a"/>
+                            <circle cx="60" cy="47" r="1" fill="white"/>
+                        </g>
+                    </g>
+                    
+                    <!-- Mouth/Speaker Grille -->
+                    <rect x="30" y="55" width="30" height="5" rx="2.5" fill="#1e293b"/>
+                    <g class="robot-mouth">
+                        <rect x="32" y="56" width="4" height="3" rx="1" fill="url(#robotAccent)" class="robot-mouth-bar"/>
+                        <rect x="38" y="56" width="4" height="3" rx="1" fill="url(#robotAccent)" class="robot-mouth-bar" style="animation-delay: 0.1s"/>
+                        <rect x="44" y="56" width="4" height="3" rx="1" fill="url(#robotAccent)" class="robot-mouth-bar" style="animation-delay: 0.2s"/>
+                        <rect x="50" y="56" width="4" height="3" rx="1" fill="url(#robotAccent)" class="robot-mouth-bar" style="animation-delay: 0.3s"/>
+                        <rect x="56" y="56" width="4" height="3" rx="1" fill="url(#robotAccent)" class="robot-mouth-bar" style="animation-delay: 0.4s"/>
+                    </g>
+                    
+                    <!-- Ear Sensors -->
+                    <circle cx="10" cy="45" r="6" fill="url(#robotBodyGrad)" stroke="#475569" stroke-width="1"/>
+                    <circle cx="10" cy="45" r="3" fill="#8b5cf6" filter="url(#glow)"/>
+                    <circle cx="80" cy="45" r="6" fill="url(#robotBodyGrad)" stroke="#475569" stroke-width="1"/>
+                    <circle cx="80" cy="45" r="3" fill="#8b5cf6" filter="url(#glow)"/>
+                </g>
+                
+                <!-- Neck -->
+                <rect x="35" y="65" width="20" height="8" rx="2" fill="url(#robotBodyGrad)" stroke="#475569" stroke-width="1"/>
+                
+                <!-- Robot Body/Torso -->
+                <g filter="url(#shadowFilter)">
+                    <rect x="20" y="72" width="50" height="35" rx="10" fill="url(#robotBodyGrad)" stroke="#475569" stroke-width="2"/>
+                    
+                    <!-- Chest Emblem -->
+                    <circle cx="45" cy="88" r="10" fill="#0f172a" stroke="url(#robotAccent)" stroke-width="2"/>
+                    <text x="45" y="91" text-anchor="middle" fill="url(#robotAccent)" font-size="8" font-weight="bold" font-family="Arial">S</text>
+                    
+                    <!-- Chest Lights -->
+                    <circle cx="30" cy="80" r="3" fill="#22c55e" filter="url(#glow)">
+                        <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="60" cy="80" r="3" fill="#06b6d4" filter="url(#glow)">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                </g>
+                
+                <!-- Arms -->
+                <g class="robot-arm robot-arm-left">
+                    <rect x="5" y="75" width="12" height="28" rx="6" fill="url(#robotBodyGrad)" stroke="#475569" stroke-width="1"/>
+                    <circle cx="11" cy="105" r="6" fill="url(#robotBodyGrad)" stroke="#475569" stroke-width="1"/>
+                    <circle cx="11" cy="105" r="3" fill="url(#robotAccent)"/>
+                </g>
+                <g class="robot-arm robot-arm-right">
+                    <rect x="73" y="75" width="12" height="28" rx="6" fill="url(#robotBodyGrad)" stroke="#475569" stroke-width="1"/>
+                    <circle cx="79" cy="105" r="6" fill="url(#robotBodyGrad)" stroke="#475569" stroke-width="1"/>
+                    <circle cx="79" cy="105" r="3" fill="url(#robotAccent)"/>
+                </g>
+            </svg>
+        </div>
+    </button>
+
+    <!-- Chatbot container -->
+    <div id="robotChatbotContainer" class="robot-chatbot-container">
+        <div class="robot-header">
+            <div class="robot-header-info">
+                <div class="robot-avatar">
+                    <!-- Mini Robot Face -->
+                    <svg viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg" width="44" height="44">
+                        <defs>
+                            <linearGradient id="miniEyeGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#22d3ee"/>
+                                <stop offset="100%" style="stop-color:#06b6d4"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Mini Head -->
+                        <rect x="5" y="10" width="40" height="32" rx="8" fill="#1e293b"/>
+                        <!-- Headband -->
+                        <rect x="3" y="15" width="44" height="6" rx="3" fill="#f97316"/>
+                        <!-- Eyes -->
+                        <ellipse cx="18" cy="28" rx="5" ry="4" fill="url(#miniEyeGlow)">
+                            <animate attributeName="ry" values="4;1;4" dur="3s" repeatCount="indefinite"/>
+                        </ellipse>
+                        <ellipse cx="32" cy="28" rx="5" ry="4" fill="url(#miniEyeGlow)">
+                            <animate attributeName="ry" values="4;1;4" dur="3s" repeatCount="indefinite"/>
+                        </ellipse>
+                        <circle cx="19" cy="27" r="1.5" fill="#0f172a"/>
+                        <circle cx="33" cy="27" r="1.5" fill="#0f172a"/>
+                        <!-- Mouth -->
+                        <rect x="14" y="35" width="22" height="3" rx="1.5" fill="#0f172a"/>
+                        <rect x="16" y="35.5" width="3" height="2" rx="0.5" fill="#f97316"/>
+                        <rect x="21" y="35.5" width="3" height="2" rx="0.5" fill="#f97316"/>
+                        <rect x="26" y="35.5" width="3" height="2" rx="0.5" fill="#f97316"/>
+                        <rect x="31" y="35.5" width="3" height="2" rx="0.5" fill="#f97316"/>
+                        <!-- Antenna -->
+                        <rect x="23" y="4" width="4" height="8" rx="2" fill="#1e293b"/>
+                        <circle cx="25" cy="3" r="4" fill="#22c55e">
+                            <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+                        </circle>
+                    </svg>
+                </div>
+                <div class="robot-header-text">
+                    <h4>Coach Bolt</h4>
+                    <span class="robot-status"><span class="robot-status-dot"></span> Ready to assist</span>
+                </div>
+            </div>
+            <button class="robot-close-btn" onclick="toggleRobotChatbot()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <!-- Page Context Banner -->
+        <div class="page-context-banner" id="pageContextBanner">
+            <div class="context-icon" id="contextIcon">
+                <i class="bi bi-speedometer2"></i>
+            </div>
+            <div class="context-text">
+                <div class="context-label">Currently viewing</div>
+                <div class="context-page" id="contextPageName">Dashboard</div>
+            </div>
+        </div>
+
+        <div id="robotChatbotMessages" class="robot-messages">
+            <!-- Initial greeting will be set by JavaScript based on page context -->
+        </div>
+        
+        <div class="robot-input-area">
+            <input type="text" id="robotChatbotInput" placeholder="Ask me anything about this page..." onkeypress="handleRobotChatKeyPress(event)">
+            <button class="robot-send-btn" onclick="sendRobotChatMessage()">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        let coachBoltActivated = false;
+
+        // ============= DETERMINE CURRENT PAGE CONTEXT =============
+        function getCurrentPageContext() {
+            const currentPath = window.location.pathname;
+            
+            let endpoint = '';
+            if (currentPath.includes('/players')) endpoint = 'players';
+            else if (currentPath.includes('/analytics')) endpoint = 'analytics';
+            else if (currentPath.includes('/statistics')) endpoint = 'statistics';
+            else if (currentPath.includes('/predictions')) endpoint = 'predictions';
+            else if (currentPath.includes('/injury-analysis')) endpoint = 'injury_analysis';
+            else if (currentPath.includes('/reports')) endpoint = 'reports';
+            else if (currentPath.includes('/treatment-timeline')) endpoint = 'treatment_timeline';
+            else if (currentPath.includes('/medication-tracker')) endpoint = 'medication_tracker';
+            else if (currentPath.includes('/second-opinion')) endpoint = 'second_opinion';
+            else if (currentPath.includes('/gait-analysis')) endpoint = 'gait_analysis';
+            else if (currentPath.includes('/fitness-products')) endpoint = 'fitness_products';
+            else if (currentPath.includes('/return-to-play')) endpoint = 'return_to_play';
+            else if (currentPath.includes('/financial-impact')) endpoint = 'financial_impact';
+            else endpoint = 'home';
+            
+            return endpoint;
+        }
+
+        // ============= THEME MANAGEMENT =============
+        const themeToggle = document.getElementById('themeToggle');
+        
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            applyTheme(savedTheme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            const icon = themeToggle.querySelector('i');
+            if (theme === 'dark') {
+                icon.className = 'bi bi-sun-fill';
+            } else {
+                icon.className = 'bi bi-moon-fill';
+            }
+            
+            // Update charts if they exist
+            updateChartsTheme();
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+
+        function updateChartsTheme() {
+            if (typeof Chart !== 'undefined') {
+                Chart.helpers.each(Chart.instances, function(instance) {
+                    const theme = document.documentElement.getAttribute('data-theme');
+                    const textColor = theme === 'dark' ? '#e2e8f0' : '#1e293b';
+                    const gridColor = theme === 'dark' ? '#374151' : '#e2e8f0';
+                    const tooltipBg = theme === 'dark' ? '#1f2937' : '#ffffff';
+                    const tooltipText = theme === 'dark' ? '#f1f5f9' : '#1e293b';
+                    
+                    if (instance.options.scales) {
+                        if (instance.options.scales.x) {
+                            instance.options.scales.x.ticks.color = textColor;
+                            instance.options.scales.x.grid.color = gridColor;
+                            if (instance.options.scales.x.title) {
+                                instance.options.scales.x.title.color = textColor;
+                            }
+                        }
+                        if (instance.options.scales.y) {
+                            instance.options.scales.y.ticks.color = textColor;
+                            instance.options.scales.y.grid.color = gridColor;
+                            if (instance.options.scales.y.title) {
+                                instance.options.scales.y.title.color = textColor;
+                            }
+                        }
+                    }
+                    
+                    if (instance.options.plugins) {
+                        if (instance.options.plugins.legend) {
+                            instance.options.plugins.legend.labels.color = textColor;
+                        }
+                        if (instance.options.plugins.tooltip) {
+                            instance.options.plugins.tooltip.backgroundColor = tooltipBg;
+                            instance.options.plugins.tooltip.titleColor = tooltipText;
+                            instance.options.plugins.tooltip.bodyColor = tooltipText;
+                        }
+                        if (instance.options.plugins.title) {
+                            instance.options.plugins.title.color = textColor;
+                        }
+                    }
+                    
+                    instance.update();
+                });
+            }
+        }
+
+        // ============= VOICE ASSISTANT FUNCTIONS =============
+        const voiceNavBtn = document.getElementById('voiceNavBtn');
+        const voiceToast = document.getElementById('voiceToast');
+        const voiceToastIcon = document.getElementById('voiceToastIcon');
+        const voiceToastTitle = document.getElementById('voiceToastTitle');
+        const voiceToastMessage = document.getElementById('voiceToastMessage');
+        const voiceWaveform = document.getElementById('voiceWaveform');
+        const energeticSong = document.getElementById('energeticSong');
+        
+        const wakeWordOverlay = document.getElementById('wakeWordOverlay');
+        const wakeWordBtn = document.getElementById('wakeWordBtn');
+        const robotChatbotToggle = document.getElementById('robotChatbotToggle');
+
+        let recognition = null;
+        let wakeWordRecognition = null;
+        let isListening = false;
+        let isWakeWordListening = false;
+        let speechSynthesis = window.speechSynthesis;
+        let sportifyVoice = null;
+
+        // Check if browser supports speech recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            // Main recognition for commands
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                voiceNavBtn.classList.add('listening');
+                showVoiceToast('listening', 'Coach Bolt', 'I\'m all ears! Tell me what you need...');
+                sportifySpeak('I\'m listening!');
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                console.log('Voice command:', transcript);
+                processVoiceCommand(transcript);
+            };
+
+            recognition.onerror = (event) => {
+                isListening = false;
+                voiceNavBtn.classList.remove('listening');
+                
+                let errorMessage = 'Oops! Something went wrong. Let\'s try again!';
+                if (event.error === 'no-speech') {
+                    errorMessage = 'I didn\'t catch that. Speak up, I won\'t bite!';
+                    sportifySpeak('I didn\'t hear you. Try again?');
+                } else if (event.error === 'not-allowed') {
+                    errorMessage = 'I need microphone access to help you. Pretty please?';
+                    sportifySpeak('I need your microphone permission to work my magic!');
+                }
+                
+                showVoiceToast('error', 'Oops!', errorMessage);
+                setTimeout(hideVoiceToast, 3000);
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                voiceNavBtn.classList.remove('listening');
+            };
+
+            wakeWordRecognition = new SpeechRecognition();
+            wakeWordRecognition.continuous = false;
+            wakeWordRecognition.interimResults = false;
+            wakeWordRecognition.lang = 'en-US';
+
+            wakeWordRecognition.onstart = () => {
+                isWakeWordListening = true;
+                wakeWordBtn.classList.add('listening');
+                wakeWordBtn.innerHTML = '<i class="bi bi-mic-fill"></i><span>Listening...</span>';
+            };
+
+            wakeWordRecognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                console.log('Wake word transcript:', transcript);
+                
+                if (transcript.includes('hey coach bolt') || 
+                    transcript.includes('coach bolt come up') || 
+                    transcript.includes('hey coach bolt come up') ||
+                    transcript.includes('coach bolt')) {
+                    activateCoachBolt();
+                } else {
+                    showVoiceToast('error', 'Try Again', `You said: "${transcript}". Say "Hey Coach Bolt Come up" to activate!`);
+                    sportifySpeak('I heard you, but please say "Hey Coach Bolt Come up" to activate me!');
+                    setTimeout(hideVoiceToast, 4000);
+                }
+            };
+
+            wakeWordRecognition.onerror = (event) => {
+                isWakeWordListening = false;
+                wakeWordBtn.classList.remove('listening');
+                wakeWordBtn.innerHTML = '<i class="bi bi-mic-fill"></i><span>Activate Voice</span>';
+                
+                if (event.error === 'no-speech') {
+                    showVoiceToast('error', 'No Speech', 'I didn\'t hear anything. Try again!');
+                } else if (event.error === 'not-allowed') {
+                    showVoiceToast('error', 'Permission Needed', 'Please allow microphone access.');
+                }
+                setTimeout(hideVoiceToast, 3000);
+            };
+
+            wakeWordRecognition.onend = () => {
+                isWakeWordListening = false;
+                wakeWordBtn.classList.remove('listening');
+                wakeWordBtn.innerHTML = '<i class="bi bi-mic-fill"></i><span>Activate Voice</span>';
+            };
+        }
+
+        function activateCoachBolt() {
+            coachBoltActivated = true;
+            
+            // Hide wake word overlay
+            wakeWordOverlay.classList.add('hidden');
+            
+            // Show robot chatbot toggle
+            robotChatbotToggle.classList.add('activated');
+            
+            // Show success message
+            showVoiceToast('success', 'Coach Bolt Activated!', 'I\'m here to help! Click on me or use voice commands!');
+            sportifySpeak('Hey there! Coach Bolt at your service! I\'m ready to help you with anything. Just click on me or use voice commands!', 'excited');
+            
+            // Save activation state
+            localStorage.setItem('coachBoltActivated', 'true');
+            
+            // Open chatbot automatically
+            setTimeout(() => {
+                toggleRobotChatbot();
+                hideVoiceToast();
+            }, 2000);
+        }
+
+        wakeWordBtn.addEventListener('click', () => {
+            if (!wakeWordRecognition) {
+                alert('Voice recognition isn\'t supported in your browser. Try Chrome, Edge, or Safari!');
+                return;
+            }
+
+            if (isWakeWordListening) {
+                wakeWordRecognition.stop();
+            } else {
+                wakeWordRecognition.start();
+            }
+        });
+
+        voiceNavBtn.addEventListener('click', () => {
+            if (!coachBoltActivated) {
+                showVoiceToast('error', 'Activate First!', 'Say "Hey Coach Bolt Come up" using the activation panel below!');
+                sportifySpeak('Please say "Hey Coach Bolt Come up" first to activate me!');
+                setTimeout(hideVoiceToast, 4000);
+                return;
+            }
+
+            if (!recognition) {
+                alert('Voice recognition isn\'t supported in your browser. Try Chrome, Edge, or Safari!');
+                return;
+            }
+
+            if (isListening) {
+                recognition.stop();
+                hideVoiceToast();
+                if (speechSynthesis) speechSynthesis.cancel();
+            } else {
+                recognition.start();
+            }
+        });
+
+        // Initialize text-to-speech voice
+        function initializeSportifyVoice() {
+            if (!speechSynthesis) {
+                console.log('Text-to-speech not supported');
+                return;
+            }
+            
+            const voices = speechSynthesis.getVoices();
+            
+            if (voices.length > 0) {
+                sportifyVoice = voices.find(v => 
+                    v.lang === 'en-US' && 
+                    (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel'))
+                ) || voices[0];
+            }
+        }
+
+        if (speechSynthesis) {
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = initializeSportifyVoice;
+            }
+            setTimeout(initializeSportifyVoice, 1000);
+        }
+
+        function sportifySpeak(text, emotion = 'neutral') {
+            if (!speechSynthesis || !sportifyVoice) {
+                console.log('Text-to-speech not available');
+                return;
+            }
+
+            speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = sportifyVoice;
+            utterance.rate = 0.85;
+            utterance.pitch = 1.1;
+            
+            if (emotion === 'excited') {
+                utterance.rate = 0.95;
+                utterance.pitch = 1.2;
+            } else if (emotion === 'flirty') {
+                utterance.rate = 0.75;
+                utterance.pitch = 1.2;
+            } else if (emotion === 'sad') {
+                utterance.rate = 0.7;
+                utterance.pitch = 0.9;
+            }
+            
+            speechSynthesis.speak(utterance);
+        }
+
+        // ============= ALL COMMAND DATA =============
+        const pageInfo = {
+            'home': {
+                url: '{{ url_for('home') }}',
+                description: 'Your sports injury command center! See all active injuries, team stats, and upcoming risks at a glance.',
+                funFact: 'This is where the magic happens! Like your sports mission control.'
+            },
+            'dashboard': {
+                url: '{{ url_for('home') }}',
+                description: 'Your sports injury command center! See all active injuries, team stats, and upcoming risks at a glance.',
+                funFact: 'This is where the magic happens! Like your sports mission control.'
+            },
+            'players': {
+                url: '{{ url_for('players') }}',
+                description: 'Browse all 2000+ athletes with detailed injury histories, risk scores, and health status.',
+                funFact: 'Ever wondered who the toughest player is? Check out their injury recovery rates here!'
+            },
+            'player': {
+                url: '{{ url_for('players') }}',
+                description: 'Browse all 2000+ athletes with detailed injury histories, risk scores, and health status.',
+                funFact: 'Ever wondered who the toughest player is? Check out their injury recovery rates here!'
+            },
+            'analytics': {
+                url: '{{ url_for('analytics') }}',
+                description: 'Deep dive into injury patterns, seasonal trends, and sport-specific analytics with beautiful charts.',
+                funFact: 'Numbers don\'t lie! This page is where data nerds fall in love.'
+            },
+            'statistics': {
+                url: '{{ url_for('statistics') }}',
+                description: 'Compare injury rates across teams and sports with comprehensive statistical analysis.',
+                funFact: 'Want to impress your coach? Drop some stats from this page!'
+            },
+            'stats': {
+                url: '{{ url_for('statistics') }}',
+                description: 'Compare injury rates across teams and sports with comprehensive statistical analysis.',
+                funFact: 'Want to impress your coach? Drop some stats from this page!'
+            },
+            'predictions': {
+                url: '{{ url_for('predictions') }}',
+                description: 'AI-powered injury risk predictions to keep your athletes safe and game-ready.',
+                funFact: 'I can predict the future! Well, at least injury risks. Pretty cool, right?'
+            },
+            'prediction': {
+                url: '{{ url_for('predictions') }}',
+                description: 'AI-powered injury risk predictions to keep your athletes safe and game-ready.',
+                funFact: 'I can predict the future! Well, at least injury risks. Pretty cool, right?'
+            },
+            'risk': {
+                url: '{{ url_for('predictions') }}',
+                description: 'AI-powered injury risk predictions to keep your athletes safe and game-ready.',
+                funFact: 'I can predict the future! Well, at least injury risks. Pretty cool, right?'
+            },
+            'injury analysis': {
+                url: '{{ url_for('injury_analysis') }}',
+                description: 'Analyze injury patterns by body part, severity, and recovery times with interactive visualizations.',
+                funFact: 'Knee injuries are trending this season... not in a good way though!'
+            },
+            'injury': {
+                url: '{{ url_for('injury_analysis') }}',
+                description: 'Analyze injury patterns by body part, severity, and recovery times.',
+                funFact: 'Fun fact: ankles are apparently very breakable. Who knew?'
+            },
+            'reports': {
+                url: '{{ url_for('reports') }}',
+                description: 'Generate professional injury reports and export data for team meetings.',
+                funFact: 'Make your coaches think you\'re a genius with these beautiful reports!'
+            },
+            'report': {
+                url: '{{ url_for('reports') }}',
+                description: 'Generate professional injury reports and export data for team meetings.',
+                funFact: 'Nothing says professional like a well-formatted PDF report!'
+            },
+            'treatment timeline': {
+                url: '{{ url_for('treatment_timeline') }}',
+                description: 'Track treatment progress with interactive timelines and milestone tracking.',
+                funFact: 'Recovery is a journey, and we\'re tracking every step!'
+            },
+            'treatment': {
+                url: '{{ url_for('treatment_timeline') }}',
+                description: 'Track treatment progress with interactive timelines and milestone tracking.',
+                funFact: 'From injury to comeback - we document it all!'
+            },
+            'medication tracker': {
+                url: '{{ url_for('medication_tracker') }}',
+                description: 'Manage medications, dosages, and schedules with automated reminders.',
+                funFact: 'Never miss a pill again! Unless you want to, but I wouldn\'t recommend it.'
+            },
+            'medication': {
+                url: '{{ url_for('medication_tracker') }}',
+                description: 'Manage medications, dosages, and schedules with automated reminders.',
+                funFact: 'Pills, potions, and painkillers - all tracked here!'
+            },
+            'second opinion': {
+                url: '{{ url_for('second_opinion') }}',
+                description: 'Get AI-powered second opinions on injury diagnoses and treatment plans.',
+                funFact: 'Two heads are better than one, especially when one is AI!'
+            },
+            'opinion': {
+                url: '{{ url_for('second_opinion') }}',
+                description: 'Get AI-powered second opinions on injury diagnoses.',
+                funFact: 'Dr. Coach Bolt is in! And the consultation is free!'
+            },
+            'video analysis': {
+                url: '{{ url_for('gait_analysis') }}',
+                description: 'Analyze movement patterns through video to identify potential injury risks and performance improvements.',
+                funFact: 'Every frame counts! Let\'s analyze your movements!'
+            },
+            'video': {
+                url: '{{ url_for('gait_analysis') }}',
+                description: 'Analyze movement patterns through video to identify potential injury risks and performance improvements.',
+                funFact: 'Your movement tells a story. Let\'s watch it!'
+            },
+            'movement': {
+                url: '{{ url_for('gait_analysis') }}',
+                description: 'Movement pattern analysis using advanced video technology.',
+                funFact: 'Motion captured, insights delivered!'
+            },
+            'fitness products': {
+                url: '{{ url_for('fitness_products') }}',
+                description: 'Discover top-rated fitness gear and exclusive deals to enhance your training and recovery.',
+                funFact: 'Gear up for success! The right equipment makes all the difference.'
+            },
+            'fitness': {
+                url: '{{ url_for('fitness_products') }}',
+                description: 'Discover top-rated fitness gear and exclusive deals to enhance your training and recovery.',
+                funFact: 'Gear up for success! The right equipment makes all the difference.'
+            },
+            'products': {
+                url: '{{ url_for('fitness_products') }}',
+                description: 'Discover top-rated fitness gear and exclusive deals to enhance your training and recovery.',
+                funFact: 'Gear up for success! The right equipment makes all the difference.'
+            },
+            'deals': {
+                url: '{{ url_for('fitness_products') }}',
+                description: 'Find the best fitness product deals to maximize your training budget.',
+                funFact: 'Don\'t miss out on these savings! Your wallet will thank you.'
+            },
+            'return to play': {
+                url: '{{ url_for('return_to_play') }}',
+                description: 'Comprehensive athlete recovery tracking and return-to-play readiness assessment.',
+                funFact: 'Getting back in the game safely is what we do best!'
+            },
+            'return': {
+                url: '{{ url_for('return_to_play') }}',
+                description: 'Track athlete recovery and readiness for competitive return.',
+                funFact: 'Every comeback story starts here!'
+            },
+            'rtp': {
+                url: '{{ url_for('return_to_play') }}',
+                description: 'Return-to-play performance analysis and recovery tracking.',
+                funFact: 'RTP analysis to get athletes back stronger than ever!'
+            },
+            'recovery': {
+                url: '{{ url_for('return_to_play') }}',
+                description: 'Monitor athlete recovery progress and readiness assessments.',
+                funFact: 'Recovery is not just rest, it\'s a science!'
+            },
+            'financial': {
+                url: '{{ url_for('financial_impact') }}',
+                description: 'Calculate the financial impact of injuries on your team.',
+                funFact: 'Numbers tell the story of injury costs!'
+            },
+            'financial impact': {
+                url: '{{ url_for('financial_impact') }}',
+                description: 'Management dashboard for injury cost analysis.',
+                funFact: 'Understanding the money behind sports medicine!'
+            }
+        };
+
+        const teacherResponses = [
+            "Teachers can only yap in lectures! But hey, at least they're passionate about it!",
+            "What can teachers do? Yap, yap, yap in class... but we still love them for it!",
+            "Teachers are professional yappers in lectures, but honestly, some of their stories are fire!",
+            "Your teacher can yap for hours in lectures without breaking a sweat! That's some serious endurance!",
+            "Teachers? They specialize in talking non-stop during lectures! It's their superpower!"
+        ];
+
+        const pickupLines = [
+            "Are you a sports injury? Because you've got my heart rate elevated!",
+            "If you were a muscle, you'd be a heart... because you're always working overtime!",
+            "Are you physical therapy? Because you make everything feel better!",
+            "You must be a championship trophy, because you're absolutely first place in my book!",
+            "Is your name WiFi? Because I'm feeling a strong connection right now!"
+        ];
+
+        const funnyCompliments = [
+            "Your friend is cooler than the ice packs in our injury treatment section!",
+            "I ran a diagnostic... Your friend scored 100% on the awesome scale!",
+            "If your friend was a player stat, they'd break all the records!",
+            "Your friend is so talented, they could probably coach ME!"
+        ];
+
+        const funnyRoasts = [
+            "You're the reason they put instructions on shampoo bottles!",
+            "Your friend runs slower than my loading screen... and that's saying something!",
+            "I've seen better coordination from a player with two sprained ankles!",
+            "Your friend's dance moves could be classified as a sports injury!"
+        ];
+
+        const jokes = [
+            "Why did the injured player bring a ladder to the game? Because they heard they needed to step up their game!",
+            "What do you call an athlete who's always getting hurt? Accident-prone to greatness!",
+            "Why don't injured players ever get lonely? Because they always have their support group!",
+            "What did the knee say to the ankle? Stop twisting my words!",
+            "Why was the physical therapist always calm? Because they knew how to handle the pressure!"
+        ];
+
+        const funFacts = [
+            "Fun fact: Athletes who warm up properly reduce injury risk by 50%!",
+            "Did you know? The average NBA player runs about 2.5 miles per game!",
+            "Cool fact: The fastest recorded tennis serve was 163 mph!",
+            "Did you know? Ice baths can reduce muscle soreness by up to 20%!",
+            "Fact: Your heart can pump 5 liters of blood every minute during exercise!"
+        ];
+
+        const friendshipQuotes = [
+            "Real friends are like stars, you don't always see them but you know they're always there!",
+            "Good friends help you find important things when you've lost them... like your smile!",
+            "A true friend is someone who thinks you're a good egg even though they know you're slightly cracked!",
+            "Friends are the family we choose for ourselves. You chose well!"
+        ];
+
+        // ============= PROCESS VOICE COMMANDS =============
+        function processVoiceCommand(transcript) {
+            showVoiceToast('processing', 'Coach Bolt', `You said: "${transcript}"`);
+            
+            const command = transcript.toLowerCase();
+            
+            if (command.includes('open video analysis') || command.includes('video analysis') || 
+                command.includes('show video') || command.includes('go to video') ||
+                command.includes('analyze video') || command.includes('movement analysis')) {
+                const response = 'Opening Video Analysis! Let\'s analyze your movement patterns!';
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response, 'excited');
+                setTimeout(() => {
+                    window.location.href = '{{ url_for('gait_analysis') }}';
+                }, 2000);
+                return;
+            }
+
+            if (command.includes('open fitness products') || command.includes('fitness products') || 
+                command.includes('show products') || command.includes('go to fitness') ||
+                command.includes('show fitness') || command.includes('open products')) {
+                const response = 'Opening Fitness Products! Time to gear up for success!';
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response, 'excited');
+                setTimeout(() => {
+                    window.location.href = '{{ url_for('fitness_products') }}';
+                }, 2000);
+                return;
+            }
+
+            if (command.includes('open return to play') || command.includes('return to play') || 
+                command.includes('show return to play') || command.includes('go to return to play') ||
+                command.includes('open rtp') || command.includes('show rtp') ||
+                command.includes('recovery analysis') || command.includes('open recovery') ||
+                command.includes('return play') || command.includes('rtp analysis')) {
+                const response = 'Opening Return-to-Play Analysis! Let\'s track your recovery journey!';
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response, 'excited');
+                setTimeout(() => {
+                    window.location.href = '{{ url_for('return_to_play') }}';
+                }, 2000);
+                return;
+            }
+
+            // Theme toggle command
+            if (command.includes('toggle theme') || command.includes('change theme') || 
+                command.includes('dark mode') || command.includes('light mode') || 
+                command.includes('switch theme') || command.includes('change mode') ||
+                command.includes('make it dark') || command.includes('make it light')) {
+                
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                const themeMessages = {
+                    dark: [
+                        "Switching to dark mode! Let's save those eyes!",
+                        "Activating dark theme! Perfect for late-night sports analysis!",
+                        "Going dark! Your eyes will thank you!"
+                    ],
+                    light: [
+                        "Light mode activated! Bright ideas incoming!",
+                        "Switching to light theme! Let there be light!",
+                        "Going light! Perfect for daytime analysis!"
+                    ]
+                };
+                
+                const messages = themeMessages[newTheme];
+                const response = messages[Math.floor(Math.random() * messages.length)];
+                
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response, 'excited');
+                
+                setTimeout(() => {
+                    applyTheme(newTheme);
+                }, 1000);
+                
+                setTimeout(hideVoiceToast, 5000);
+                return;
+            }
+
+            // Fill sample data and predict command
+            if ((command.includes('fill sample data') || command.includes('fill sample') || 
+                 command.includes('sample data') || command.includes('use sample data') ||
+                 command.includes('test prediction') || command.includes('demo prediction')) && 
+                window.location.pathname.includes('/predictions')) {
+                
+                const response = "Filling sample data and running prediction analysis! Let me work my magic!";
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response, 'excited');
+                
+                setTimeout(() => {
+                    const form = document.getElementById('predictionForm');
+                    if (form) {
+                        form.querySelector('[name="sport"]').value = 'Football';
+                        form.querySelector('[name="age"]').value = 28;
+                        form.querySelector('[name="height"]').value = 188;
+                        form.querySelector('[name="weight"]').value = 95;
+                        form.querySelector('[name="years_pro"]').value = 6;
+                        form.querySelector('[name="training_hours"]').value = 30;
+                        form.querySelector('[name="prev_injuries"]').value = 3;
+                        form.querySelector('[name="surgeries"]').value = 1;
+                        form.querySelector('[name="chronic_condition"]').value = 'Knee Issues';
+                        form.querySelector('[name="fitness"]').value = 78;
+                        form.querySelector('[name="current_injury"]').value = 'Minor';
+                        
+                        showVoiceToast('success', 'Data Filled', 'Sample data loaded! Now running prediction...');
+                        sportifySpeak('Sample data loaded! Now running prediction analysis...');
+                        
+                        setTimeout(() => {
+                            const submitEvent = new Event('submit');
+                            form.dispatchEvent(submitEvent);
+                            
+                            showVoiceToast('success', 'Prediction Complete', 'Analysis complete! Check the results below.');
+                            sportifySpeak('Prediction analysis complete! Check the results on the page!');
+                        }, 1500);
+                    } else {
+                        showVoiceToast('error', 'Oops!', 'I couldn\'t find the prediction form on this page.');
+                        sportifySpeak('Oops! I couldn\'t find the prediction form on this page.');
+                    }
+                }, 1000);
+                
+                setTimeout(hideVoiceToast, 8000);
+                return;
+            }
+
+            // Music commands
+            if ((command.includes('spotify') && (command.includes('play') || command.includes('song'))) ||
+                command.includes('feeling bored') || command.includes('feeling bore') || 
+                command.includes('i am bored') || command.includes('im bored') || 
+                command.includes('energetic song') || command.includes('play music') || 
+                command.includes('play song') || command.includes('want to listen')) {
+                
+                const responses = [
+                    'Spotify mode activated! Let me play an energetic track for you!',
+                    'Time to energize! Playing an awesome song on Spotify!',
+                    'Feeling bored? Let me pump you up with some energetic beats!',
+                    'Say goodbye to boredom! Here comes the energy boost!'
+                ];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response, 'excited');
+                
+                setTimeout(() => {
+                    if (energeticSong) {
+                        energeticSong.currentTime = 0;
+                        energeticSong.volume = 0.7;
+                        energeticSong.play().then(() => {
+                            showVoiceToast('success', 'Now Playing', 'Dhurandhar - Arabic Mix');
+                        }).catch(error => {
+                            console.error('Error playing music:', error);
+                            showVoiceToast('error', 'Error', 'Could not play music');
+                        });
+                    }
+                }, 3000);
+                
+                setTimeout(hideVoiceToast, 8000);
+                return;
+            }
+
+            // Pickup lines
+            if (command.includes('pickup line') || command.includes('pick up line') || command.includes('flirt with') || command.includes('compliment my friend')) {
+                const line = pickupLines[Math.floor(Math.random() * pickupLines.length)];
+                showVoiceToast('success', 'Coach Bolt', line);
+                sportifySpeak(line, 'flirty');
+                setTimeout(hideVoiceToast, 6000);
+                return;
+            }
+
+            // Compliments
+            if (command.includes('compliment') && (command.includes('friend') || command.includes('someone'))) {
+                const compliment = funnyCompliments[Math.floor(Math.random() * funnyCompliments.length)];
+                showVoiceToast('success', 'Coach Bolt', compliment);
+                sportifySpeak(compliment, 'excited');
+                setTimeout(hideVoiceToast, 6000);
+                return;
+            }
+
+            // Roasts
+            if (command.includes('roast') || command.includes('make fun') || command.includes('insult')) {
+                const roast = funnyRoasts[Math.floor(Math.random() * funnyRoasts.length)];
+                showVoiceToast('success', 'Coach Bolt', roast);
+                sportifySpeak(roast, 'excited');
+                setTimeout(hideVoiceToast, 6000);
+                return;
+            }
+
+            // Jokes
+            if (command.includes('tell me a joke') || command.includes('make me laugh') || command.includes('joke') || command.includes('funny')) {
+                const joke = jokes[Math.floor(Math.random() * jokes.length)];
+                showVoiceToast('success', 'Coach Bolt', joke);
+                sportifySpeak(joke, 'excited');
+                setTimeout(hideVoiceToast, 6000);
+                return;
+            }
+
+            // Fun facts
+            if (command.includes('fun fact') || command.includes('tell me something') || command.includes('interesting fact')) {
+                const fact = funFacts[Math.floor(Math.random() * funFacts.length)];
+                showVoiceToast('success', 'Coach Bolt', fact);
+                sportifySpeak(fact);
+                setTimeout(hideVoiceToast, 6000);
+                return;
+            }
+
+            // Friendship quotes
+            if (command.includes('friendship') || command.includes('about friends') || command.includes('friend quote')) {
+                const quote = friendshipQuotes[Math.floor(Math.random() * friendshipQuotes.length)];
+                showVoiceToast('success', 'Coach Bolt', quote);
+                sportifySpeak(quote);
+                setTimeout(hideVoiceToast, 7000);
+                return;
+            }
+
+            // Stop music
+            if (command.includes('stop music') || command.includes('stop song') || 
+                command.includes('pause music') || command.includes('pause song')) {
+                if (energeticSong) {
+                    energeticSong.pause();
+                    energeticSong.currentTime = 0;
+                }
+                const response = 'Music stopped! Let me know if you want to play it again!';
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response);
+                setTimeout(hideVoiceToast, 4000);
+                return;
+            }
+
+            // Current page
+            if (command.includes('where am i') || command.includes('current page') || command.includes('what page')) {
+                const currentPath = window.location.pathname;
+                let currentPageName = 'Dashboard';
+                for (const [key, info] of Object.entries(pageInfo)) {
+                    if (info.url === currentPath || (currentPath === '/' && key === 'home')) {
+                        currentPageName = key.charAt(0).toUpperCase() + key.slice(1);
+                        const response = `You're on the ${currentPageName} page. ${info.funFact}`;
+                        showVoiceToast('success', 'Coach Bolt', response);
+                        sportifySpeak(response);
+                        setTimeout(hideVoiceToast, 5000);
+                        return;
+                    }
+                }
+                showVoiceToast('success', 'Coach Bolt', `You're on the ${currentPageName} page.`);
+                sportifySpeak(`You're on the ${currentPageName} page.`);
+                setTimeout(hideVoiceToast, 4000);
+                return;
+            }
+
+            // List pages
+            if (command.includes('list pages') || command.includes('show all pages') || command.includes('available pages') || command.includes('what pages')) {
+                const pageNames = Object.keys(pageInfo).slice(0, 8).join(', ');
+                const response = `I can navigate to: ${pageNames}, and more! Just say "open" followed by any page name.`;
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response);
+                setTimeout(hideVoiceToast, 8000);
+                return;
+            }
+
+            // Go back
+            if (command.includes('go back') || command.includes('previous page') || command.includes('back')) {
+                const response = 'Taking you back to the previous page!';
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response);
+                setTimeout(() => {
+                    window.history.back();
+                }, 1500);
+                return;
+            }
+
+            // Refresh page
+            if (command.includes('refresh') || command.includes('reload')) {
+                const response = 'Refreshing the page for you!';
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+                return;
+            }
+
+            // Time check
+            if (command.includes('what time') || command.includes('current time')) {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                const response = `It's ${timeStr}. Time flies when you're managing sports injuries!`;
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response);
+                setTimeout(hideVoiceToast, 5000);
+                return;
+            }
+
+            // Date check
+            if (command.includes('what date') || command.includes('today date') || command.includes('what day')) {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+                const response = `Today is ${dateStr}. Make it count!`;
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response);
+                setTimeout(hideVoiceToast, 5000);
+                return;
+            }
+
+            // Motivational quotes
+            if (command.includes('motivate me') || command.includes('inspiration') || command.includes('quote')) {
+                const quotes = [
+                    'Champions keep playing until they get it right! Keep going!',
+                    'Success is not final, failure is not fatal. It\'s the courage to continue that counts!',
+                    'The difference between ordinary and extraordinary is that little extra!',
+                    'Push yourself because no one else is going to do it for you!',
+                    'Great things never come from comfort zones!'
+                ];
+                const quote = quotes[Math.floor(Math.random() * quotes.length)];
+                showVoiceToast('success', 'Coach Bolt', quote);
+                sportifySpeak(quote, 'excited');
+                setTimeout(hideVoiceToast, 6000);
+                return;
+            }
+
+            // Introduction
+            if (command.includes('who are you') || command.includes('introduce yourself') || command.includes('about you')) {
+                const response = 'I\'m Coach Bolt, your AI sports injury assistant! I can navigate pages, provide information, motivate you, and even make you laugh. I\'m here to make your experience smoother than a perfect three-pointer!';
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response, 'excited');
+                setTimeout(hideVoiceToast, 8000);
+                return;
+            }
+
+            // Teacher responses
+            if (command.includes('teacher') || command.includes('professor') || command.includes('instructor') || command.includes('coach')) {
+                const response = teacherResponses[Math.floor(Math.random() * teacherResponses.length)];
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response, 'flirty');
+                setTimeout(hideVoiceToast, 6000);
+                return;
+            }
+
+            // Greeting
+            if (command.includes('hello') || command.includes('hi ') || command.includes('hey')) {
+                const greetings = [
+                    'Hey there! I\'m Coach Bolt, your friendly AI assistant. How can I help you today?',
+                    'Hello! Ready to navigate through some awesome sports injury data?',
+                    'Hi! I\'m Coach Bolt, and I\'m here to make your life easier. What do you need?'
+                ];
+                const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+                showVoiceToast('success', 'Coach Bolt', greeting);
+                sportifySpeak(greeting);
+                setTimeout(hideVoiceToast, 5000);
+                return;
+            }
+
+            // Thank you
+            if (command.includes('thank you') || command.includes('thanks')) {
+                const responses = [
+                    'You\'re welcome! Happy to help!',
+                    'My pleasure! That\'s what I\'m here for!',
+                    'No problem! Just doing my job with style!'
+                ];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response);
+                setTimeout(hideVoiceToast, 4000);
+                return;
+            }
+
+            // Help command
+            if (command.includes('help') || command.includes('what can you do') || command.includes('commands')) {
+                const helpText = 'I can navigate pages like "open video analysis" or "open fitness products", tell jokes, give pickup lines, share fun facts, motivate you, play energetic songs, change themes with "toggle theme", and so much more!';
+                showVoiceToast('success', 'Coach Bolt', helpText);
+                sportifySpeak(helpText);
+                setTimeout(hideVoiceToast, 10000);
+                return;
+            }
+
+            // Navigation commands
+            let targetPage = null;
+            let targetInfo = null;
+
+            const patterns = [
+                /(?:open|go to|show|navigate to|take me to|visit)\s+(?:the\s+)?(.+?)(?:\s+page)?$/i,
+                /(?:show me|display)\s+(?:the\s+)?(.+?)$/i
+            ];
+
+            for (const pattern of patterns) {
+                const match = command.match(pattern);
+                if (match) {
+                    targetPage = match[1].trim();
+                    break;
+                }
+            }
+
+            if (!targetPage) {
+                for (const key of Object.keys(pageInfo)) {
+                    if (command.includes(key)) {
+                        targetPage = key;
+                        break;
+                    }
+                }
+            }
+
+            if (targetPage) {
+                for (const [key, info] of Object.entries(pageInfo)) {
+                    if (targetPage.includes(key) || key.includes(targetPage)) {
+                        targetInfo = info;
+                        break;
+                    }
+                }
+            }
+
+            if (targetInfo) {
+                const pageName = targetPage.charAt(0).toUpperCase() + targetPage.slice(1);
+                const response = `Taking you to ${pageName}! ${targetInfo.funFact}`;
+                showVoiceToast('success', 'Coach Bolt', response);
+                sportifySpeak(response, 'excited');
+                setTimeout(() => {
+                    window.location.href = targetInfo.url;
+                }, 2000);
+            } else {
+                const sorryMessage = `Hmm, I couldn't find "${command}". Try saying "open video analysis", "open fitness products", "toggle theme", or ask "what can you do?" for help!`;
+                showVoiceToast('error', 'Coach Bolt', sorryMessage);
+                sportifySpeak(sorryMessage);
+                setTimeout(hideVoiceToast, 6000);
+            }
+        }
+
+        function showVoiceToast(type, title, message) {
+            voiceToastIcon.className = `voice-toast-icon ${type}`;
+            voiceToastTitle.textContent = title;
+            voiceToastMessage.textContent = message;
+            
+            if (type === 'listening') {
+                voiceWaveform.style.display = 'flex';
+            } else {
+                voiceWaveform.style.display = 'none';
+            }
+
+            const iconMap = {
+                listening: 'bi-mic-fill',
+                processing: 'bi-cpu',
+                success: 'bi-check-circle-fill',
+                error: 'bi-exclamation-circle-fill'
+            };
+            voiceToastIcon.innerHTML = `<i class="bi ${iconMap[type]}"></i>`;
+
+            voiceToast.classList.add('show');
+        }
+
+        function hideVoiceToast() {
+            voiceToast.classList.remove('show');
+        }
+
+        // ============= ROBOT CHATBOT FUNCTIONS =============
+        let currentPageContext = '';
+
+        function toggleRobotChatbot() {
+            const container = document.getElementById('robotChatbotContainer');
+            const toggle = document.getElementById('robotChatbotToggle');
+            
+            container.classList.toggle('open');
+            toggle.classList.toggle('open');
+        }
+
+        function initializeRobotChatbot() {
+            const messagesContainer = document.getElementById('robotChatbotMessages');
+            const contextIcon = document.getElementById('contextIcon');
+            const contextPageName = document.getElementById('contextPageName');
+            
+            const pageContextConfig = {
+                'home': { icon: 'bi-speedometer2', name: 'Dashboard', greeting: 'Welcome to the Dashboard! I can help you understand the overview stats, navigate to specific sections, or answer questions about injury data.' },
+                'players': { icon: 'bi-people', name: 'Players', greeting: 'You\'re viewing the Players database! I can help you search for specific players, filter by sport or injury status, or explain player statistics.' },
+                'analytics': { icon: 'bi-bar-chart', name: 'Analytics', greeting: 'Welcome to Analytics! I can explain the charts, help you understand trends, or guide you through the data visualizations.' },
+                'statistics': { icon: 'bi-graph-up', name: 'Statistics', greeting: 'You\'re on the Statistics page! I can help interpret the numbers, compare different metrics, or explain statistical concepts.' },
+                'predictions': { icon: 'bi-shield-check', name: 'Risk Predictions', greeting: 'Welcome to Risk Predictions! I can help you understand risk factors, explain the prediction model, or guide you through creating predictions.' },
+                'injury_analysis': { icon: 'bi-camera', name: 'Injury Analysis', greeting: 'You\'re in Injury Analysis! I can help you understand injury patterns, explain severity levels, or guide you through the analysis tools.' },
+                'reports': { icon: 'bi-file-earmark-text', name: 'Reports', greeting: 'Welcome to Reports! I can help you generate reports, explain the data included, or guide you through export options.' },
+                'treatment_timeline': { icon: 'bi-calendar-check', name: 'Treatment Timeline', greeting: 'You\'re viewing Treatment Timeline! I can help you track recovery progress, understand milestones, or add new treatment entries.' },
+                'medication_tracker': { icon: 'bi-capsule', name: 'Medication Tracker', greeting: 'Welcome to Medication Tracker! I can help you manage medications, set reminders, or explain dosage information.' },
+                'second_opinion': { icon: 'bi-chat-square-dots', name: 'Second Opinion', greeting: 'You\'re in Second Opinion! I can help you get AI-powered insights on injuries, explain diagnoses, or suggest treatment options.' },
+                'gait_analysis': { icon: 'bi-person-walking', name: 'Gait Analysis', greeting: 'Welcome to Gait Analysis! I can help you understand movement patterns, analyze stride data, or identify potential injury risks from your gait.' },
+                'fitness_products': { icon: 'bi-cart-check', name: 'Fitness Products', greeting: 'You\'re browsing Fitness Products! I can help you find the right gear, explain product benefits, or find the best deals for your training needs.' },
+                'return_to_play': { icon: 'bi-arrow-counterclockwise', name: 'Return-to-Play', greeting: 'Welcome to Return-to-Play Analysis! I can help you track athlete recovery, understand readiness assessments, or explain the RTP protocol phases.' },
+                'financial_impact': { icon: 'bi-currency-dollar', name: 'Financial Impact', greeting: 'You\'re viewing Financial Impact! I can help you understand injury costs, calculate team impact, or analyze budget implications.' }
+            };
+            
+            const config = pageContextConfig[currentPageContext] || pageContextConfig['home'];
+            
+            contextIcon.innerHTML = `<i class="bi ${config.icon}"></i>`;
+            contextPageName.textContent = config.name;
+            
+            messagesContainer.innerHTML = '';
+            addRobotMessage(config.greeting);
+        }
+
+        function addRobotMessage(text) {
+            const messagesContainer = document.getElementById('robotChatbotMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'robot-message bot';
+            messageDiv.innerHTML = `
+                <div class="robot-msg-avatar">
+                    <i class="bi bi-robot"></i>
+                </div>
+                <div class="robot-msg-content">
+                    <p>${text}</p>
+                </div>
+            `;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addUserMessage(text) {
+            const messagesContainer = document.getElementById('robotChatbotMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'robot-message user';
+            messageDiv.innerHTML = `
+                <div class="robot-msg-avatar">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="robot-msg-content">
+                    <p>${text}</p>
+                </div>
+            `;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function handleRobotChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendRobotChatMessage();
+            }
+        }
+
+        function sendRobotChatMessage() {
+            const input = document.getElementById('robotChatbotInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addUserMessage(message);
+            input.value = '';
+            
+            setTimeout(() => {
+                const response = generateRobotResponse(message);
+                addRobotMessage(response);
+            }, 500);
+        }
+
+        function generateRobotResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Navigation responses
+            if (lowerMessage.includes('video') || lowerMessage.includes('movement') || lowerMessage.includes('walking') || lowerMessage.includes('analyze')) {
+                return 'Video Analysis helps you understand movement patterns and identify potential injury risks through video. Would you like me to take you there? Just say "open video analysis"!';
+            }
+            
+            if (lowerMessage.includes('product') || lowerMessage.includes('gear') || lowerMessage.includes('equipment') || lowerMessage.includes('fitness')) {
+                return 'Looking for fitness gear? Our Fitness Products page has great deals on training equipment! Say "open fitness products" to check it out!';
+            }
+            
+            if (lowerMessage.includes('return to play') || lowerMessage.includes('rtp') || lowerMessage.includes('recovery') || lowerMessage.includes('comeback')) {
+                return 'Return-to-Play Analysis tracks athlete recovery and readiness for competition. It includes AI predictions, protocol phases, and performance metrics. Say "open return to play" to explore!';
+            }
+            
+            if (lowerMessage.includes('financial') || lowerMessage.includes('cost') || lowerMessage.includes('budget') || lowerMessage.includes('money')) {
+                return 'The Financial Impact page helps you understand the cost of injuries to your team. Say "open financial impact" to see the analysis!';
+            }
+            
+            if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
+                return 'I can help you navigate this page, answer questions about the data, explain features, or guide you to other sections. Try asking about specific features or say "open" followed by a page name like "open return to play"!';
+            }
+            
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+                return 'Hey there! Great to chat with you! How can I help you today?';
+            }
+            
+            if (lowerMessage.includes('thank')) {
+                return 'You\'re welcome! I\'m always here to help. Anything else you need?';
+            }
+            
+            if (lowerMessage.includes('joke')) {
+                const jokes = [
+                    'Why did the injured player bring a ladder? Because they heard they needed to step up their game!',
+                    'What do you call an athlete who\'s always getting hurt? Accident-prone to greatness!',
+                    'Why don\'t injured players ever get lonely? Because they always have their support group!'
+                ];
+                return jokes[Math.floor(Math.random() * jokes.length)];
+            }
+            
+            // Default response
+            const defaultResponses = [
+                'That\'s interesting! Let me know if you need help with anything specific on this page.',
+                'I\'m here to help! Feel free to ask about any features or data you see.',
+                'Great question! Is there anything specific about this page I can explain?',
+                'I\'m always learning! Let me know what you\'d like to know more about.'
+            ];
+            
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        }
+
+        // ============= GLOBAL SEARCH FUNCTIONALITY =============
+        const globalSearchInput = document.getElementById('globalSearch');
+        const searchResultsContainer = document.getElementById('searchResults');
+        let searchTimeout = null;
+
+        // All searchable items including pages, features, and common terms
+        const searchableItems = [
+            // Pages
+            { title: 'Dashboard', description: 'Main overview and statistics', url: '{{ url_for('home') }}', icon: 'bi-speedometer2', type: 'Page' },
+            { title: 'Players', description: 'Browse all 2000+ athletes', url: '{{ url_for('players') }}', icon: 'bi-people', type: 'Page' },
+            { title: 'Analytics', description: 'Charts and data analysis', url: '{{ url_for('analytics') }}', icon: 'bi-bar-chart', type: 'Page' },
+            { title: 'Statistics', description: 'Comprehensive statistical analysis', url: '{{ url_for('statistics') }}', icon: 'bi-graph-up', type: 'Page' },
+            { title: 'Risk Predictions', description: 'AI-powered injury risk assessment', url: '{{ url_for('predictions') }}', icon: 'bi-shield-check', type: 'Page' },
+            { title: 'Injury Analysis', description: 'Image-based injury analysis', url: '{{ url_for('injury_analysis') }}', icon: 'bi-camera', type: 'Page' },
+            { title: 'Reports', description: 'Generate and export reports', url: '{{ url_for('reports') }}', icon: 'bi-file-earmark-text', type: 'Page' },
+            { title: 'Treatment Timeline', description: 'Track treatment progress', url: '{{ url_for('treatment_timeline') }}', icon: 'bi-calendar-check', type: 'Page' },
+            { title: 'Medication Tracker', description: 'Manage medications and schedules', url: '{{ url_for('medication_tracker') }}', icon: 'bi-capsule', type: 'Page' },
+            { title: 'Second Opinion', description: 'AI-powered diagnosis insights', url: '{{ url_for('second_opinion') }}', icon: 'bi-chat-square-dots', type: 'Page' },
+            { title: 'Video Analysis', description: 'Movement pattern video analysis', url: '{{ url_for('gait_analysis') }}', icon: 'bi-camera-video', type: 'Page' },
+            { title: 'Return-to-Play', description: 'Recovery and readiness assessment', url: '{{ url_for('return_to_play') }}', icon: 'bi-arrow-counterclockwise', type: 'Page' },
+            { title: 'Fitness Products', description: 'Training gear and equipment', url: '{{ url_for('fitness_products') }}', icon: 'bi-cart-check', type: 'Page' },
+            { title: 'Financial Impact', description: 'Injury cost analysis', url: '{{ url_for('financial_impact') }}', icon: 'bi-currency-dollar', type: 'Page' },
+            // Sports
+            { title: 'Football Players', description: 'View all football athletes', url: '{{ url_for('players') }}?sport=Football', icon: 'bi-trophy', type: 'Sport' },
+            { title: 'Basketball Players', description: 'View all basketball athletes', url: '{{ url_for('players') }}?sport=Basketball', icon: 'bi-trophy', type: 'Sport' },
+            { title: 'Soccer Players', description: 'View all soccer athletes', url: '{{ url_for('players') }}?sport=Soccer', icon: 'bi-trophy', type: 'Sport' },
+            { title: 'Baseball Players', description: 'View all baseball athletes', url: '{{ url_for('players') }}?sport=Baseball', icon: 'bi-trophy', type: 'Sport' },
+            { title: 'Tennis Players', description: 'View all tennis athletes', url: '{{ url_for('players') }}?sport=Tennis', icon: 'bi-trophy', type: 'Sport' },
+            { title: 'Hockey Players', description: 'View all hockey athletes', url: '{{ url_for('players') }}?sport=Hockey', icon: 'bi-trophy', type: 'Sport' },
+            { title: 'Rugby Players', description: 'View all rugby athletes', url: '{{ url_for('players') }}?sport=Rugby', icon: 'bi-trophy', type: 'Sport' },
+            { title: 'Cricket Players', description: 'View all cricket athletes', url: '{{ url_for('players') }}?sport=Cricket', icon: 'bi-trophy', type: 'Sport' },
+            { title: 'Swimming Athletes', description: 'View all swimming athletes', url: '{{ url_for('players') }}?sport=Swimming', icon: 'bi-trophy', type: 'Sport' },
+            { title: 'Athletics Athletes', description: 'View all athletics athletes', url: '{{ url_for('players') }}?sport=Athletics', icon: 'bi-trophy', type: 'Sport' },
+            // Injury filters
+            { title: 'Injured Players', description: 'View currently injured athletes', url: '{{ url_for('players') }}?injury=injured', icon: 'bi-bandaid', type: 'Filter' },
+            { title: 'Healthy Players', description: 'View healthy athletes', url: '{{ url_for('players') }}?injury=healthy', icon: 'bi-heart-pulse', type: 'Filter' },
+            { title: 'High Risk Players', description: 'View high risk athletes', url: '{{ url_for('players') }}?sort=risk_score&order=desc', icon: 'bi-exclamation-triangle', type: 'Filter' },
+            // Common injuries
+            { title: 'ACL Injuries', description: 'Search ACL related injuries', url: '{{ url_for('players') }}?search=ACL', icon: 'bi-bandaid', type: 'Injury' },
+            { title: 'Hamstring Injuries', description: 'Search hamstring related injuries', url: '{{ url_for('players') }}?search=Hamstring', icon: 'bi-bandaid', type: 'Injury' },
+            { title: 'Concussion Cases', description: 'Search concussion cases', url: '{{ url_for('players') }}?search=Concussion', icon: 'bi-bandaid', type: 'Injury' },
+            { title: 'Ankle Injuries', description: 'Search ankle related injuries', url: '{{ url_for('players') }}?search=Ankle', icon: 'bi-bandaid', type: 'Injury' },
+            { title: 'Knee Injuries', description: 'Search knee related injuries', url: '{{ url_for('players') }}?search=Knee', icon: 'bi-bandaid', type: 'Injury' },
+            // Features
+            { title: 'Toggle Dark Mode', description: 'Switch to dark theme', url: '#', icon: 'bi-moon-fill', type: 'Action', action: 'toggleDark' },
+            { title: 'Toggle Light Mode', description: 'Switch to light theme', url: '#', icon: 'bi-sun-fill', type: 'Action', action: 'toggleLight' },
+        ];
+
+        function performSearch(query) {
+            if (!query || query.length < 2) {
+                searchResultsContainer.classList.remove('show');
+                return;
+            }
+
+            const lowerQuery = query.toLowerCase();
+            
+            // Filter local searchable items
+            const localResults = searchableItems.filter(item => 
+                item.title.toLowerCase().includes(lowerQuery) || 
+                item.description.toLowerCase().includes(lowerQuery) ||
+                item.type.toLowerCase().includes(lowerQuery)
+            ).slice(0, 5);
+
+            // Also fetch from API for player/team search
+            fetch(`/api/search?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const apiResults = data.results || [];
+                    displaySearchResults(localResults, apiResults);
+                })
+                .catch(err => {
+                    console.error('Search API error:', err);
+                    displaySearchResults(localResults, []);
+                });
+        }
+
+        function displaySearchResults(localResults, apiResults) {
+            searchResultsContainer.innerHTML = '';
+
+            if (localResults.length === 0 && apiResults.length === 0) {
+                searchResultsContainer.innerHTML = `
+                    <div class="search-no-results">
+                        <i class="bi bi-search" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 0.5rem;"></i>
+                        <p>No results found. Try a different search term.</p>
+                    </div>
+                `;
+                searchResultsContainer.classList.add('show');
+                return;
+            }
+
+            // Add local results (pages, features, etc.)
+            localResults.forEach(item => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.innerHTML = `
+                    <div class="search-result-icon" style="background: ${getIconColor(item.type)};">
+                        <i class="bi ${item.icon}"></i>
+                    </div>
+                    <div class="search-result-content">
+                        <div class="search-result-title">${item.title}</div>
+                        <div class="search-result-meta">${item.type} • ${item.description}</div>
+                    </div>
+                `;
+                resultItem.addEventListener('click', () => {
+                    if (item.action === 'toggleDark') {
+                        applyTheme('dark');
+                        searchResultsContainer.classList.remove('show');
+                        globalSearchInput.value = '';
+                    } else if (item.action === 'toggleLight') {
+                        applyTheme('light');
+                        searchResultsContainer.classList.remove('show');
+                        globalSearchInput.value = '';
+                    } else {
+                        window.location.href = item.url;
+                    }
+                });
+                searchResultsContainer.appendChild(resultItem);
+            });
+
+            // Add API results (players, teams)
+            apiResults.forEach(item => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.innerHTML = `
+                    <div class="search-result-icon" style="background: ${getIconColor(item.type)};">
+                        <i class="bi ${item.icon}"></i>
+                    </div>
+                    <div class="search-result-content">
+                        <div class="search-result-title">${item.title}</div>
+                        <div class="search-result-meta">${item.type} • ${item.meta}</div>
+                    </div>
+                `;
+                resultItem.addEventListener('click', () => {
+                    window.location.href = item.url;
+                });
+                searchResultsContainer.appendChild(resultItem);
+            });
+
+            searchResultsContainer.classList.add('show');
+        }
+
+        function getIconColor(type) {
+            const colors = {
+                'Page': 'var(--accent-primary)',
+                'Sport': 'linear-gradient(135deg, #06b6d4 0%, #2563eb 100%)',
+                'Filter': 'var(--accent-warning)',
+                'Injury': 'var(--accent-danger)',
+                'Player': 'var(--accent-success)',
+                'Team': 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)',
+                'Action': 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+            };
+            return colors[type] || 'var(--accent-primary)';
+        }
+
+        globalSearchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                performSearch(e.target.value.trim());
+            }, 300);
+        });
+
+        globalSearchInput.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2) {
+                performSearch(this.value.trim());
+            }
+        });
+
+        globalSearchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const firstResult = searchResultsContainer.querySelector('.search-result-item');
+                if (firstResult) {
+                    firstResult.click();
+                } else if (this.value.trim()) {
+                    // If no results, search in players
+                    window.location.href = '{{ url_for('players') }}?search=' + encodeURIComponent(this.value.trim());
+                }
+            } else if (e.key === 'Escape') {
+                searchResultsContainer.classList.remove('show');
+                this.blur();
+            }
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.header-search')) {
+                searchResultsContainer.classList.remove('show');
+            }
+        });
+
+        // ============= INITIALIZE EVERYTHING =============
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme first
+            initializeTheme();
+            
+            const previouslyActivated = localStorage.getItem('coachBoltActivated') === 'true';
+            if (previouslyActivated) {
+                coachBoltActivated = true;
+                wakeWordOverlay.classList.add('hidden');
+                robotChatbotToggle.classList.add('activated');
+            }
+            
+            // Initialize robot chatbot
+            currentPageContext = getCurrentPageContext();
+            setTimeout(initializeRobotChatbot, 100);
+            
+            // Sidebar toggle functionality
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+            }
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                
+                const collapsed = sidebar.classList.contains('collapsed');
+                localStorage.setItem('sidebarCollapsed', collapsed);
+            });
+            
+            // Mobile: Show/hide sidebar
+            if (window.innerWidth <= 768) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                });
+                
+                document.addEventListener('click', function(event) {
+                    const isClickInside = sidebar.contains(event.target) || sidebarToggle.contains(event.target);
+                    if (!isClickInside && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+
+            // Initialize voice system
+            setTimeout(initializeSportifyVoice, 500);
+        });
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

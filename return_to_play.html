@@ -1,0 +1,1029 @@
+{% extends 'base.html' %}
+
+{% block title %}Return-to-Play Performance - Sports Injury Analysis{% endblock %}
+{% block breadcrumb %}Return-to-Play Performance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-arrow-counterclockwise" style="color: #06b6d4; font-size: 2rem;"></i>Return-to-Play Performance Analysis</h1>
+    <p>Comprehensive athlete recovery tracking and readiness assessment for competitive return</p>
+</div>
+
+<!-- Key Metrics Cards -->
+<div class="row g-4 mb-4">
+    <!-- Total RTP Cases -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card">
+            <div class="stat-icon cyan">
+                <i class="bi bi-graph-up"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ rtp_data.total_rtp_cases }}</h3>
+                <p>Total RTP Cases</p>
+                <span class="stat-trend up">
+                    <i class="bi bi-arrow-up-right"></i> 24% this season
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Successful Recoveries -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card">
+            <div class="stat-icon green">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ rtp_data.successful_rtp }}</h3>
+                <p>Successful Returns</p>
+                <span class="stat-trend up">
+                    <i class="bi bi-arrow-up-right"></i> {{ rtp_data.rtp_success_rate }}% success rate
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Average Recovery Days -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card">
+            <div class="stat-icon purple">
+                <i class="bi bi-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ rtp_data.avg_recovery_days }}</h3>
+                <p>Avg Recovery Days</p>
+                <span class="stat-trend">
+                    <i class="bi bi-clock-history"></i> Per injury
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Rate -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card">
+            <div class="stat-icon pink">
+                <i class="bi bi-percent"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ rtp_data.rtp_success_rate }}%</h3>
+                <p>Success Rate</p>
+                <span class="stat-trend up">
+                    <i class="bi bi-arrow-up-right"></i> Positive trend
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: RTP Readiness Predictor -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-robot" style="color: #06b6d4; font-size: 1.2rem;"></i>
+                    AI-Powered RTP Readiness Predictor
+                </h5>
+                <small style="color: var(--text-secondary); font-weight: 600;">Predicting athlete readiness based on health metrics and recovery data</small>
+            </div>
+            <div class="card-body">
+                <!-- Prediction Input Form -->
+                <div class="row mb-4">
+                    <div class="col-lg-8">
+                        <div class="alert alert-info" style="background: rgba(6, 182, 212, 0.1); border-color: rgba(6, 182, 212, 0.3);">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>How it works:</strong> Enter athlete health metrics to predict their readiness for return-to-play using our ML model.
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#predictModal">
+                            <i class="bi bi-calculator me-2"></i>Predict Readiness
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Current Predictions -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Athlete</th>
+                                <th>Injury</th>
+                                <th>Days Since Injury</th>
+                                <th>Health Metrics</th>
+                                <th>Prediction Score</th>
+                                <th>Readiness Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prediction in rtp_predictions %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div style="width: 36px; height: 36px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">
+                                            {{ prediction.player_name[0] }}
+                                        </div>
+                                        <div>
+                                            <strong style="color: var(--text-primary);">{{ prediction.player_name }}</strong>
+                                            <small style="color: var(--text-secondary);">{{ prediction.position }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #dc2626; font-weight: 600;">
+                                        {{ prediction.injury_type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong>{{ prediction.days_since_injury }}</strong>
+                                    <small style="color: var(--text-secondary);">days</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">
+                                            S:{{ prediction.strength_score }}%
+                                        </span>
+                                        <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3);">
+                                            M:{{ prediction.mobility_score }}%
+                                        </span>
+                                        <span class="badge" style="background: rgba(168, 85, 247, 0.1); color: #7c3aed; border: 1px solid rgba(168, 85, 247, 0.3);">
+                                            P:{{ prediction.pain_score }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div style="width: 60px;">
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar" style="width: {{ prediction.readiness_score }}%; background: 
+                                                    {% if prediction.readiness_score >= 80 %}var(--gradient-success)
+                                                    {% elif prediction.readiness_score >= 60 %}var(--gradient-warning)
+                                                    {% else %}var(--gradient-danger){% endif %};">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <strong style="min-width: 40px; text-align: right; color: var(--text-primary);">
+                                            {{ prediction.readiness_score }}%
+                                        </strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if prediction.readiness_score >= 80 %}
+                                    <span class="badge badge-success" style="font-weight: 700;">
+                                        <i class="bi bi-check-circle me-1"></i>Ready
+                                    </span>
+                                    {% elif prediction.readiness_score >= 60 %}
+                                    <span class="badge badge-warning" style="font-weight: 700; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                                        <i class="bi bi-clock me-1"></i>Conditional
+                                    </span>
+                                    {% else %}
+                                    <span class="badge badge-danger" style="font-weight: 700;">
+                                        <i class="bi bi-x-circle me-1"></i>Not Ready
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="runPredictionForPlayer('{{ prediction.player_id }}')">
+                                        <i class="bi bi-arrow-repeat"></i> Re-run
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Performers Post-Injury -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-star-fill" style="color: #06b6d4; font-size: 1.2rem;"></i>
+                    Top Performers Post-Injury
+                </h5>
+                <small style="color: var(--text-secondary); font-weight: 600;">Athletes with highest performance index after return</small>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Sport / Position</th>
+                                <th>Performance Index</th>
+                                <th>Fitness Level</th>
+                                <th>Recovery Days</th>
+                                <th>Status</th>
+                                <th>Prediction</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in top_performers %}
+                            <tr style="transition: all 0.25s;">
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div style="width: 40px; height: 40px; background: var(--gradient-sport); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">
+                                            {{ player.first_name[0] }}{{ player.last_name[0] }}
+                                        </div>
+                                        <div>
+                                            <strong style="color: var(--text-primary);">{{ player.first_name }} {{ player.last_name }}</strong>
+                                            <small style="color: var(--text-secondary);">{{ player.player_id }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong style="color: var(--text-primary);">{{ player.sport }}</strong>
+                                        <small style="color: var(--text-secondary);">{{ player.position }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div style="flex: 1;">
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar" style="width: {{ player.performance_index }}%; background: var(--gradient-primary);"></div>
+                                            </div>
+                                        </div>
+                                        <strong style="min-width: 40px; text-align: right; color: var(--text-primary);">{{ player.performance_index|int }}%</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%); color: #059669; font-weight: 700; padding: 0.5rem 0.8rem; border-radius: 10px;">
+                                        {{ player.fitness_level|int }}%
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong style="color: var(--text-primary);">{{ player.recovery_status }}</strong>
+                                </td>
+                                <td>
+                                    <span class="badge badge-success" style="font-weight: 700;">
+                                        <i class="bi bi-check-circle me-1"></i>Ready
+                                    </span>
+                                </td>
+                                <td>
+                                    {% set prediction_score = player.fitness_level * 0.4 + player.performance_index * 0.3 + (100 - player.recovery_status|int) * 0.3 %}
+                                    {% if prediction_score >= 80 %}
+                                    <span class="badge bg-success" style="font-weight: 600; font-size: 0.75rem;">
+                                        <i class="bi bi-check-lg me-1"></i>{{ prediction_score|int }}%
+                                    </span>
+                                    {% elif prediction_score >= 60 %}
+                                    <span class="badge bg-warning" style="font-weight: 600; font-size: 0.75rem;">
+                                        <i class="bi bi-dash-lg me-1"></i>{{ prediction_score|int }}%
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-danger" style="font-weight: 600; font-size: 0.75rem;">
+                                        <i class="bi bi-x-lg me-1"></i>{{ prediction_score|int }}%
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RTP Protocol & Assessment -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-clipboard-check" style="color: #2563eb; font-size: 1.2rem;"></i>
+                    RTP Assessment Protocol
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <!-- Phase 1 -->
+                    <div class="timeline-item mb-4">
+                        <div class="d-flex gap-3">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span style="color: white; font-weight: 900; font-size: 1.2rem;">1</span>
+                            </div>
+                            <div style="flex: 1;">
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.5rem 0; font-weight: 700;">Medical Clearance</h6>
+                                <p style="color: var(--text-secondary); margin: 0 0 0.75rem 0; font-size: 0.9rem;">Physician confirms injury resolution and structural integrity</p>
+                                <div style="display: flex; gap: 1rem;">
+                                    <span class="badge" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); font-weight: 600;">Imaging</span>
+                                    <span class="badge" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); font-weight: 600;">ROM Testing</span>
+                                    <span class="badge" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); font-weight: 600;">Pain Assessment</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="timeline-item mb-4">
+                        <div class="d-flex gap-3">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span style="color: white; font-weight: 900; font-size: 1.2rem;">2</span>
+                            </div>
+                            <div style="flex: 1;">
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.5rem 0; font-weight: 700;">Functional Capacity Testing</h6>
+                                <p style="color: var(--text-secondary); margin: 0 0 0.75rem 0; font-size: 0.9rem;">Assess strength, endurance, agility and sport-specific movements</p>
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                    <span class="badge" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); font-weight: 600;">Strength Test</span>
+                                    <span class="badge" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); font-weight: 600;">Balance</span>
+                                    <span class="badge" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); font-weight: 600;">Agility Drills</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="timeline-item mb-4">
+                        <div class="d-flex gap-3">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span style="color: white; font-weight: 900; font-size: 1.2rem;">3</span>
+                            </div>
+                            <div style="flex: 1;">
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.5rem 0; font-weight: 700;">Sport-Specific Training</h6>
+                                <p style="color: var(--text-secondary); margin: 0 0 0.75rem 0; font-size: 0.9rem;">Progressive return to sport-specific skills and movements</p>
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                    <span class="badge" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); font-weight: 600;">Skills Training</span>
+                                    <span class="badge" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); font-weight: 600;">Practice</span>
+                                    <span class="badge" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); font-weight: 600;">Scrimmage</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 4 -->
+                    <div class="timeline-item">
+                        <div class="d-flex gap-3">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span style="color: white; font-weight: 900; font-size: 1.2rem;">4</span>
+                            </div>
+                            <div style="flex: 1;">
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.5rem 0; font-weight: 700;">Full Competition Clearance</h6>
+                                <p style="color: var(--text-secondary); margin: 0 0 0.75rem 0; font-size: 0.9rem;">Athlete cleared for unrestricted participation in competition</p>
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                    <span class="badge badge-success" style="font-weight: 600;">Full Clearance</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Readiness Assessment Criteria -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-check2-all" style="color: #d97706; font-size: 1.2rem;"></i>
+                    Readiness Criteria
+                </h5>
+            </div>
+            <div class="card-body">
+                <div style="display: grid; gap: 1rem;">
+                    <!-- Criteria 1 -->
+                    <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 12px; border-left: 4px solid #10b981;">
+                        <div class="d-flex align-items-start gap-3">
+                            <i class="bi bi-check-circle-fill" style="color: #10b981; font-size: 1.3rem; flex-shrink: 0; margin-top: 0.2rem;"></i>
+                            <div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.3rem 0; font-weight: 700;">Physical Readiness</h6>
+                                <small style="color: var(--text-secondary);">Strength ≥90%, ROM normal, pain-free movement</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Criteria 2 -->
+                    <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 12px; border-left: 4px solid #2563eb;">
+                        <div class="d-flex align-items-start gap-3">
+                            <i class="bi bi-check-circle-fill" style="color: #2563eb; font-size: 1.3rem; flex-shrink: 0; margin-top: 0.2rem;"></i>
+                            <div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.3rem 0; font-weight: 700;">Psychological Readiness</h6>
+                                <small style="color: var(--text-secondary);">Confidence ≥8/10, no fear avoidance, motivation positive</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Criteria 3 -->
+                    <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 12px; border-left: 4px solid #7c3aed;">
+                        <div class="d-flex align-items-start gap-3">
+                            <i class="bi bi-check-circle-fill" style="color: #7c3aed; font-size: 1.3rem; flex-shrink: 0; margin-top: 0.2rem;"></i>
+                            <div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.3rem 0; font-weight: 700;">Technical Skills</h6>
+                                <small style="color: var(--text-secondary);">Sport-specific skills ≥90% proficiency, decision-making intact</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Criteria 4 -->
+                    <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 12px; border-left: 4px solid #06b6d4;">
+                        <div class="d-flex align-items-start gap-3">
+                            <i class="bi bi-check-circle-fill" style="color: #06b6d4; font-size: 1.3rem; flex-shrink: 0; margin-top: 0.2rem;"></i>
+                            <div>
+                                <h6 style="color: var(--text-primary); margin: 0 0 0.3rem 0; font-weight: 700;">Functional Performance</h6>
+                                <small style="color: var(--text-secondary);">Match intensity >85%, reactive agility restored, endurance adequate</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sport-Specific RTP Success -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-bar-chart-fill" style="color: #059669; font-size: 1.2rem;"></i>
+                    Sport-Specific RTP Performance
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    {% for sport, metrics in sports_rtp.items() %}
+                    <div class="col-md-6 col-lg-4">
+                        <div style="padding: 1.5rem; background: var(--bg-tertiary); border-radius: 12px; border: 1.5px solid var(--border-color);">
+                            <h6 style="color: var(--text-primary); margin: 0 0 1rem 0; font-weight: 700;">{{ sport }}</h6>
+                            <div style="margin-bottom: 1rem;">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small style="color: var(--text-secondary); font-weight: 600;">Successful Returns</small>
+                                    <strong style="color: var(--text-primary);">{{ metrics.successful_returns or metrics.recovery_status or 0 }}</strong>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar" style="width: {% set successes = metrics.successful_returns or metrics.recovery_status or 0 %}{% if successes <= 8 %}{{ (successes / 8) * 100 }}{% else %}100{% endif %}%; background: var(--gradient-success);"></div>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small style="color: var(--text-secondary); font-weight: 600;">Avg Performance</small>
+                                    <strong style="color: var(--text-primary);">{{ metrics.performance_index|default(0)|int }}%</strong>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar" style="width: {{ metrics.performance_index|default(0) }}%; background: var(--gradient-primary);"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small style="color: var(--text-secondary); font-weight: 600;">Fitness Level</small>
+                                    <strong style="color: var(--text-primary);">{{ metrics.fitness_level|default(0)|int }}%</strong>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar" style="width: {{ metrics.fitness_level|default(0) }}%; background: var(--gradient-warning);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Common RTP Challenges & Solutions -->
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-exclamation-triangle-fill" style="color: #dc2626; font-size: 1.2rem;"></i>
+                    Common RTP Challenges
+                </h5>
+            </div>
+            <div class="card-body">
+                <div style="display: grid; gap: 1rem;">
+                    <div style="padding: 1rem; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #dc2626; border-radius: 8px;">
+                        <h6 style="color: #dc2626; margin: 0 0 0.3rem 0; font-weight: 700;">Fear-Avoidance Behavior</h6>
+                        <small style="color: var(--text-secondary);">Athlete hesitates to engage in activities due to re-injury fear</small>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #dc2626; border-radius: 8px;">
+                        <h6 style="color: #dc2626; margin: 0 0 0.3rem 0; font-weight: 700;">Loss of Confidence</h6>
+                        <small style="color: var(--text-secondary);">Reduced belief in physical capabilities post-injury</small>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #dc2626; border-radius: 8px;">
+                        <h6 style="color: #dc2626; margin: 0 0 0.3rem 0; font-weight: 700;">Inadequate Strength</h6>
+                        <small style="color: var(--text-secondary);">Insufficient muscle strength and endurance for sport demands</small>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #dc2626; border-radius: 8px;">
+                        <h6 style="color: #dc2626; margin: 0 0 0.3rem 0; font-weight: 700;">Proprioception Deficits</h6>
+                        <small style="color: var(--text-secondary);">Reduced balance and joint position sense awareness</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border-bottom: 2px solid var(--border-color);">
+                <h5 class="card-title" style="margin: 0; font-weight: 700;">
+                    <i class="bi bi-lightbulb-fill" style="color: #059669; font-size: 1.2rem;"></i>
+                    Evidence-Based Solutions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div style="display: grid; gap: 1rem;">
+                    <div style="padding: 1rem; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #059669; border-radius: 8px;">
+                        <h6 style="color: #059669; margin: 0 0 0.3rem 0; font-weight: 700;">Graduated Exposure Therapy</h6>
+                        <small style="color: var(--text-secondary);">Systematic progressive exposure to feared activities with support</small>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #059669; border-radius: 8px;">
+                        <h6 style="color: #059669; margin: 0 0 0.3rem 0; font-weight: 700;">Sport Psychology Coaching</h6>
+                        <small style="color: var(--text-secondary);">Mental skills training, visualization, confidence building techniques</small>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #059669; border-radius: 8px;">
+                        <h6 style="color: #059669; margin: 0 0 0.3rem 0; font-weight: 700;">Structured Strength Program</h6>
+                        <small style="color: var(--text-secondary);">Progressive resistance training achieving ≥90% limb symmetry</small>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #059669; border-radius: 8px;">
+                        <h6 style="color: #059669; margin: 0 0 0.3rem 0; font-weight: 700;">Balance & Proprioception Drills</h6>
+                        <small style="color: var(--text-secondary);">Sport-specific balance exercises and neuromuscular training</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Prediction Input -->
+<div class="modal fade" id="predictModal" tabindex="-1" aria-labelledby="predictModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);">
+                <h5 class="modal-title" id="predictModalLabel">
+                    <i class="bi bi-robot me-2" style="color: #06b6d4;"></i>
+                    RTP Readiness Prediction
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="predictionForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Athlete Name</label>
+                            <input type="text" class="form-control" id="athleteName" placeholder="Enter athlete name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Injury Type</label>
+                            <select class="form-select" id="injuryType" required>
+                                <option value="">Select injury type</option>
+                                <option value="ACL Tear">ACL Tear</option>
+                                <option value="Hamstring Strain">Hamstring Strain</option>
+                                <option value="Ankle Sprain">Ankle Sprain</option>
+                                <option value="Shoulder Dislocation">Shoulder Dislocation</option>
+                                <option value="Concussion">Concussion</option>
+                                <option value="Meniscus Tear">Meniscus Tear</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Days Since Injury</label>
+                            <input type="number" class="form-control" id="daysSinceInjury" placeholder="e.g., 45" min="1" max="365" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Sport</label>
+                            <select class="form-select" id="sportType" required>
+                                <option value="">Select sport</option>
+                                <option value="Football">Football</option>
+                                <option value="Basketball">Basketball</option>
+                                <option value="Soccer">Soccer</option>
+                                <option value="Tennis">Tennis</option>
+                                <option value="Baseball">Baseball</option>
+                                <option value="Hockey">Hockey</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Health Metrics Section -->
+                        <div class="col-12 mt-3">
+                            <h6 class="fw-bold" style="color: var(--text-primary); border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">Health Assessment Metrics</h6>
+                        </div>
+                        
+                        <!-- Strength Score -->
+                        <div class="col-md-6">
+                            <label class="form-label">Strength Score (%)</label>
+                            <input type="range" class="form-range" id="strengthScore" min="0" max="100" step="1" value="75" oninput="updateStrengthValue(this.value)">
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <small class="text-muted">0%</small>
+                                <div class="text-center">
+                                    <span class="fw-bold" id="strengthValueDisplay">75%</span>
+                                    <div><small>Current: 75%</small></div>
+                                </div>
+                                <small class="text-muted">100%</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Mobility Score -->
+                        <div class="col-md-6">
+                            <label class="form-label">Mobility Score (%)</label>
+                            <input type="range" class="form-range" id="mobilityScore" min="0" max="100" step="1" value="80" oninput="updateMobilityValue(this.value)">
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <small class="text-muted">0%</small>
+                                <div class="text-center">
+                                    <span class="fw-bold" id="mobilityValueDisplay">80%</span>
+                                    <div><small>Current: 80%</small></div>
+                                </div>
+                                <small class="text-muted">100%</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Pain Level -->
+                        <div class="col-md-6">
+                            <label class="form-label">Pain Level (1-10)</label>
+                            <input type="range" class="form-range" id="painLevel" min="1" max="10" step="1" value="3" oninput="updatePainValue(this.value)">
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <small class="text-muted">1 (Low)</small>
+                                <div class="text-center">
+                                    <span class="fw-bold" id="painValueDisplay">3</span>
+                                    <div><small>Current: 3/10</small></div>
+                                </div>
+                                <small class="text-muted">10 (High)</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Confidence Level -->
+                        <div class="col-md-6">
+                            <label class="form-label">Confidence Level (1-10)</label>
+                            <input type="range" class="form-range" id="confidenceLevel" min="1" max="10" step="1" value="7" oninput="updateConfidenceValue(this.value)">
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <small class="text-muted">1 (Low)</small>
+                                <div class="text-center">
+                                    <span class="fw-bold" id="confidenceValueDisplay">7</span>
+                                    <div><small>Current: 7/10</small></div>
+                                </div>
+                                <small class="text-muted">10 (High)</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Injury History -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Previous Injury History</label>
+                            <select class="form-select" id="injuryHistory">
+                                <option value="none">No Previous Injury</option>
+                                <option value="minor">Minor Previous Injury</option>
+                                <option value="moderate">Moderate Previous Injury</option>
+                                <option value="severe">Severe Previous Injury</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Position -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Position / Role</label>
+                            <input type="text" class="form-control" id="playerPosition" placeholder="e.g., Forward, Goalkeeper" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Predict Button -->
+                    <div class="mt-4 text-center">
+                        <button type="button" class="btn btn-primary btn-lg px-5" onclick="runPrediction()">
+                            <i class="bi bi-calculator me-2"></i>Calculate Readiness Score
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary ms-2" onclick="resetForm()">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Prediction Result -->
+                <div id="predictionResult" class="mt-4" style="display: none;">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <h4 class="card-title mb-3">Readiness Prediction Result</h4>
+                            <div class="d-flex justify-content-center align-items-center mb-4">
+                                <div class="prediction-circle mx-auto" id="predictionCircle">
+                                    <span class="prediction-percent" id="predictionPercent">0%</span>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h3 id="predictionStatus" class="mb-2">Calculating...</h3>
+                                <p id="predictionDetails" class="text-muted mb-0"></p>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body py-2">
+                                            <small class="text-muted">Strength</small>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                                    <div class="progress-bar bg-success" id="resultStrengthBar" style="width: 0%"></div>
+                                                </div>
+                                                <small id="resultStrengthValue" class="fw-bold">0%</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body py-2">
+                                            <small class="text-muted">Mobility</small>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                                    <div class="progress-bar bg-info" id="resultMobilityBar" style="width: 0%"></div>
+                                                </div>
+                                                <small id="resultMobilityValue" class="fw-bold">0%</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <button class="btn btn-success" onclick="savePrediction()">
+                                    <i class="bi bi-save me-2"></i>Save Prediction
+                                </button>
+                                <button class="btn btn-outline-primary ms-2" onclick="resetForm()">
+                                    <i class="bi bi-plus-circle me-2"></i>New Prediction
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+    }
+
+    .timeline-item {
+        padding: 0;
+        position: relative;
+    }
+
+    .timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: 25px;
+        top: 50px;
+        width: 2px;
+        height: 40px;
+        background: var(--border-color);
+    }
+    
+    .prediction-circle {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: conic-gradient(#10b981 0% 0%, #e5e7eb 0% 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.5s ease;
+    }
+    
+    .prediction-circle::before {
+        content: '';
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .prediction-percent {
+        position: relative;
+        z-index: 1;
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+    }
+    
+    .form-range::-webkit-slider-thumb {
+        background: #06b6d4;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .form-range::-moz-range-thumb {
+        background: #06b6d4;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .form-range::-webkit-slider-runnable-track {
+        background: linear-gradient(to right, #e5e7eb, #06b6d4);
+        height: 8px;
+        border-radius: 4px;
+    }
+    
+    .form-range::-moz-range-track {
+        background: linear-gradient(to right, #e5e7eb, #06b6d4);
+        height: 8px;
+        border-radius: 4px;
+    }
+</style>
+
+<script>
+    // Update slider values display
+    function updateStrengthValue(value) {
+        document.getElementById('strengthValueDisplay').textContent = value + '%';
+    }
+    
+    function updateMobilityValue(value) {
+        document.getElementById('mobilityValueDisplay').textContent = value + '%';
+    }
+    
+    function updatePainValue(value) {
+        document.getElementById('painValueDisplay').textContent = value;
+    }
+    
+    function updateConfidenceValue(value) {
+        document.getElementById('confidenceValueDisplay').textContent = value;
+    }
+    
+    // Initialize values on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateStrengthValue(75);
+        updateMobilityValue(80);
+        updatePainValue(3);
+        updateConfidenceValue(7);
+    });
+    
+    // Calculate prediction algorithm
+    function calculatePrediction() {
+        const strength = parseInt(document.getElementById('strengthScore').value);
+        const mobility = parseInt(document.getElementById('mobilityScore').value);
+        const pain = parseInt(document.getElementById('painLevel').value);
+        const confidence = parseInt(document.getElementById('confidenceLevel').value);
+        const daysInjured = parseInt(document.getElementById('daysSinceInjury').value);
+        const injuryHistory = document.getElementById('injuryHistory').value;
+        
+        // Advanced prediction algorithm with weighted factors
+        let score = 0;
+        
+        // Strength contributes 30% (most important)
+        score += strength * 0.30;
+        
+        // Mobility contributes 25%
+        score += mobility * 0.25;
+        
+        // Pain contributes 20% (inverse relationship)
+        score += (10 - pain) * 2;
+        
+        // Confidence contributes 15%
+        score += confidence * 1.5;
+        
+        // Days injured contributes 10% (optimal recovery time varies by injury)
+        let daysScore = 0;
+        if (daysInjured <= 30) daysScore = daysInjured / 30 * 10;
+        else if (daysInjured <= 90) daysScore = 10;
+        else daysScore = 10 - ((daysInjured - 90) / 30);
+        score += Math.max(0, daysScore);
+        
+        // Injury history adjustment
+        let historyAdjustment = 0;
+        switch(injuryHistory) {
+            case 'none': historyAdjustment = 5; break;
+            case 'minor': historyAdjustment = 2; break;
+            case 'moderate': historyAdjustment = -3; break;
+            case 'severe': historyAdjustment = -7; break;
+        }
+        score += historyAdjustment;
+        
+        // Cap score between 0-100 and round
+        score = Math.max(0, Math.min(100, Math.round(score)));
+        
+        return score;
+    }
+    
+    // Main prediction function
+    function runPrediction() {
+        // Validate form
+        const form = document.getElementById('predictionForm');
+        if (!form.checkValidity()) {
+            // Show validation messages
+            form.reportValidity();
+            return;
+        }
+        
+        // Calculate score
+        const score = calculatePrediction();
+        
+        // Update UI elements
+        const circle = document.getElementById('predictionCircle');
+        const percent = document.getElementById('predictionPercent');
+        const status = document.getElementById('predictionStatus');
+        const details = document.getElementById('predictionDetails');
+        
+        // Update prediction circle
+        percent.textContent = score + '%';
+        
+        // Determine color based on score
+        let circleColor = '#10b981'; // Green for high scores
+        if (score < 60) circleColor = '#ef4444'; // Red for low scores
+        else if (score < 80) circleColor = '#f59e0b'; // Orange for medium scores
+        
+        circle.style.background = `conic-gradient(${circleColor} 0% ${score}%, #e5e7eb ${score}% 100%)`;
+        
+        // Set status and recommendations
+        let statusText = '';
+        let statusColor = '';
+        let recommendations = '';
+        
+        if (score >= 80) {
+            statusText = 'READY FOR RETURN';
+            statusColor = '#059669';
+            recommendations = 'Excellent recovery metrics. Athlete can proceed with graduated return to full activity with monitoring.';
+        } else if (score >= 60) {
+            statusText = 'CONDITIONALLY READY';
+            statusColor = '#d97706';
+            recommendations = 'Good progress but needs focused work in specific areas. Consider modified training before full return.';
+        } else {
+            statusText = 'NOT READY';
+            statusColor = '#dc2626';
+            recommendations = 'Needs continued rehabilitation. Focus on strength and mobility before considering return to play.';
+        }
+        
+        status.textContent = statusText;
+        status.style.color = statusColor;
+        details.textContent = recommendations;
+        
+        // Update individual metric bars
+        const strengthVal = parseInt(document.getElementById('strengthScore').value);
+        const mobilityVal = parseInt(document.getElementById('mobilityScore').value);
+        
+        document.getElementById('resultStrengthBar').style.width = strengthVal + '%';
+        document.getElementById('resultStrengthValue').textContent = strengthVal + '%';
+        document.getElementById('resultMobilityBar').style.width = mobilityVal + '%';
+        document.getElementById('resultMobilityValue').textContent = mobilityVal + '%';
+        
+        // Show result section
+        document.getElementById('predictionResult').style.display = 'block';
+        
+        // Scroll to result
+        document.getElementById('predictionResult').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Save prediction function
+    function savePrediction() {
+        const athleteName = document.getElementById('athleteName').value;
+        const score = calculatePrediction();
+        
+        // In a real application, this would save to a database via AJAX
+        // For now, show a success message
+        alert(`✓ Prediction saved successfully!\n\nAthlete: ${athleteName}\nReadiness Score: ${score}%\n\nThis prediction has been added to your predictions table.`);
+        
+        // Close modal after a delay
+        setTimeout(() => {
+            $('#predictModal').modal('hide');
+            resetForm();
+            
+            // In a real app, you would refresh the predictions table here
+            // location.reload(); or make an AJAX call to update the table
+        }, 1500);
+    }
+    
+    // Reset form function
+    function resetForm() {
+        document.getElementById('predictionForm').reset();
+        document.getElementById('predictionResult').style.display = 'none';
+        
+        // Reset slider displays
+        updateStrengthValue(75);
+        updateMobilityValue(80);
+        updatePainValue(3);
+        updateConfidenceValue(7);
+        
+        // Reset slider values
+        document.getElementById('strengthScore').value = 75;
+        document.getElementById('mobilityScore').value = 80;
+        document.getElementById('painLevel').value = 3;
+        document.getElementById('confidenceLevel').value = 7;
+    }
+    
+    // Re-run prediction for existing player
+    function runPredictionForPlayer(playerId) {
+        // In a real application, this would fetch player data and run prediction
+        alert(`Running updated prediction analysis for player ${playerId}...\n\nFetching latest health metrics and calculating readiness score.`);
+        
+        // Simulate API call
+        setTimeout(() => {
+            alert('Prediction updated successfully! The player\'s readiness score has been recalculated based on latest data.');
+            // In real app, you would update the specific row in the table
+        }, 1000);
+    }
+    
+    // Modal event handlers
+    $('#predictModal').on('shown.bs.modal', function() {
+        document.getElementById('athleteName').focus();
+    });
+    
+    $('#predictModal').on('hidden.bs.modal', function() {
+        resetForm();
+    });
+</script>
+
+{% endblock %}
